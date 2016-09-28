@@ -9,15 +9,23 @@ router.get('/pesquisa', function(req, res, next) {
   rive.loadFile([
     "files/teste.rive",
     "files/teste2.rive"
-  ], done, erro);
+  ], doneCallcack, erroCallback);
 
-  function done (batch_num) {
+  function doneCallcack (batch_num) {
+
       rive.sortReplies();
-      res.json({  dados: rive.reply("local-user", req.query.q)  });
+      var reply = rive.reply("local-user", req.query.q);
+
+      res.statusCode = 200;
+      res.json({  dados: { statusCode: res.statusCode, mensagem: reply }});
+
   }
 
-  function erro (err) {
-    res.send('Erro ocorreu' + err);
+  function erroCallback (err) {
+
+    res.statusCode = 500;
+    res.json({ dados : { statusCode: res.statusCode, mensagem: 'Erro interno' } });
+
   }
 
 });
