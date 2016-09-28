@@ -1,0 +1,36 @@
+{
+  "name": "usain-bot-api",
+  "version": "1.0.0",
+  "description": "Serviço dedicado a bots do Centro de Informática da Universidade Federal de Pernambuco",
+  "main": "app.js",
+  "dependencies": {
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "file-system": "^2.2.1",
+    "mongoose": "*",
+    "rivescript": "^1.16.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://jorgehclinhares@gitlab.com/usain-bot/api.git"
+  },
+  "keywords": [
+    "chatterbot",
+    "cin",
+    "ufpe",
+    "bot",
+    "rivescript"
+  ],
+  "author": "Jorge Linhares",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/usain-bot/api/issues"
+  },
+  "homepage": "https://gitlab.com/usain-bot/api#README"
+}
