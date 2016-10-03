@@ -7,8 +7,7 @@ router.get('/pesquisa', function(req, res, next) {
   var rive = new RiveScript();
 
   rive.loadFile([
-    "files/teste.rive",
-    "files/teste2.rive"
+    "files/cin.rive"
   ], doneCallcack, erroCallback);
 
   function doneCallcack (batch_num) {

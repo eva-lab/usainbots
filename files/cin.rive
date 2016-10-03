@@ -1,0 +1,23 @@
+! version = 2.0
+
+
+// variáveis
+! var nomeCentro     = Centro de Informática da Universidade Federal de Pernambuco
+
+
+// substituicoes
+! sub centro de informatica     = cin
+
++ [*] (o que|fale sobre|o que faz|defina) [*] cin [*]
+- O Centro de Informática da Universidade Federal de Pernambuco é o centro responsável pelos cursos de graduação em Ciência da Computação, Sistemas de Informação e Engenharia da Computação, além dos cursos de pós-graduação em Ciência da Computação.
+
++ [*] (curso|cursos) [*] cin
+- Ciência da Computação, Engenharia da Computação e Sistemas de Informação.
+
++ [*] (grupo|grupos) [*] cin
+- Corpo Docente - Lista de professores do Centro de Informática \n
+^ CITi - Centro Integrado de Tecnologia da Informação \n
+^ DA - Diretório Acadêmico \n
+^ Maratona de Programação \n
+^ PET - Programa de Educação Tutorial \n
+^ BEPiD - Programa educacional brasileiro para desenvolvimento em iOS

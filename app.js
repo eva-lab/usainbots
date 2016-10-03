@@ -14,6 +14,6 @@ loader("controllers", function (files){
 });
 
 // Estartando o Serviço
-app.listen(3000, function () {
+app.listen(8080, function () {
   console.log('Service ON');
 });
