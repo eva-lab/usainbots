@@ -1,6 +1,10 @@
-var request   = require('request');
-var cheerio   = require('cheerio');
-var url       = require('url-parse');
+var request   = require('request'),
+    cheerio   = require('cheerio'),
+    url       = require('url-parse'),
+    html2json = require('html2json').html2json,
+    jvd       = require('jsvardump'),
+    each      = require('each'),
+    cheerio   = require('cheerio');
 
 module.exports = function (){
 
@@ -13,38 +17,55 @@ module.exports = function (){
     { "titulo": "CIn - Graduação", "url": "http://www2.cin.ufpe.br/site/index.php" }
   ];
 
-  request(pages[0].url, getPage);
+  request(pages[1].url, getPage);
 
   function getPage(err, res, body) {
 
-    if(err) {
-      console.log("Error: " + error);
-      return;
+    if (err) {
+      console.log("Error: " + error); return;
     }
 
-    if(res.statusCode === 200) {
+    if (res.statusCode === 200) {
 
-      var $ = cheerio.load(body);
-      var cursos = null,
-          grupos = null;
+      var $ = cheerio.load(body, { decodeEntities: false });
 
-      $('div#mw-content-text').each(function(index) {
+      $('html').find("script,noscript,style").remove();
+      each([html2json($.html())]);
 
-        cursos = $(this).find('ul').eq(2).text().split("\n");
-        grupos = $(this).find('ul').eq(3).text().split("\n");
+    }
 
-        for (var i = 0; i < cursos.length; i++) {
-          cursos[i] = cursos[i].trim();
+  }
+
+  function each(obj) {
+
+    var mensagem = [];
+
+    for (var k in obj){
+        if (typeof obj[k] == "object" && obj[k] !== null) {
+
+          if (obj[k].text) {
+
+            // remove blank space
+            obj[k].text = obj[k].text.trim();
+
+            // line break
+            obj[k].text = obj[k].text.replace(/\r?\n|\r|\t/g, "");
+
+            // remove links
+            if (obj[k].text.substring(0,4).toLowerCase() != 'http') {
+
+              // get text with length > 20
+              if(obj[k].text.length > 30) {
+                mensagem.push(obj[k].text);
+                console.log(obj[k].text);
+              }
+
+            }
+
+          }
+
+          each(obj[k]);
         }
-
-        for (var i = 0; i < grupos.length; i++) {
-          grupos[i] = grupos[i].trim();
-        }
-
-      });
-
-      console.log(cursos, grupos);
-
     }
 
   }
