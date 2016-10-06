@@ -6,10 +6,12 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
+    "each": "^0.6.1",
     "express": "^4.14.0",
     "file-system": "^2.2.1",
+    "html2json": "^1.0.2",
+    "jsvardump": "^1.0.2",
     "mongoose": "*",
-    "queue": "^4.0.0",
     "request": "^2.75.0",
     "rivescript": "^1.16.0",
     "url-parse": "^1.1.3"
