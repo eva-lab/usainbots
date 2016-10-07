@@ -73,3 +73,35 @@ exports.atualizar = function(dadosReq, callback) {
   });
 
 };
+
+// Pegar entidades de um cliente
+exports.pegarPeloIdCliente = function(id, callback) {
+
+  Entidade.find({ 'idCliente' : id }, function (err, dados) {
+    // docs is an array
+
+    if (err) {
+      callback(true, dados);
+    } else {
+
+      var entidades = [];
+
+      for (var i = 0; i < dados.length; i++) {
+        entidades.push({
+          script: dados[i].script || null,
+          textos: dados[i].textos || null,
+          url: dados[i].url || null
+        })
+      }
+
+      callback(false, {
+        _id: dados[0].idCliente,
+        nome: dados[0].nome,
+        entidades: entidades
+      });
+
+    }
+
+  });
+
+};
