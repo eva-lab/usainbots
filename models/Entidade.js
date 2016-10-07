@@ -34,3 +34,42 @@ exports.cadastrar = function(dados, callback) {
   });
 
 };
+
+// Cadastrar uma Entidade
+exports.atualizar = function(dadosReq, callback) {
+
+  Entidade.findById(dadosReq.idEntidade, function(err, dados){
+
+      if(err){
+        callback(true, err);
+      } else {
+
+        if (dadosReq.dados.nome) {
+          dados.nome = dadosReq.dados.nome;
+        }
+
+        if (dadosReq.dados.url) {
+          dados.url = dadosReq.dados.url;
+        }
+
+        if (dadosReq.dados.textos) {
+          dados.textos = dadosReq.dados.textos;
+        }
+
+        if (dadosReq.dados.script) {
+          dados.script = dadosReq.dados.script;
+        }
+
+        dados.save(function(err){
+          if(err){
+            callback(true, err);
+          } else {
+            callback(false, dados);
+          }
+        });
+
+      }
+
+  });
+
+};
