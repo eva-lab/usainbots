@@ -1,7 +1,8 @@
-var express     = require('express');
-var bodyParser  = require('body-parser');
-var app         = express();
-var loader      = require('./lib/loader');
+var express     = require('express'),
+    bodyParser  = require('body-parser'),
+    app         = express(),
+    loader      = require('./lib/loader'),
+    mongoose    = require('mongoose');
 
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,7 +14,16 @@ loader("controllers", function (files){
   }
 });
 
-// Estartando o Serviço
+// Connect Mongodb
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/usainbot', function(err){
+    if(err){
+      console.log('Não foi possível conectar ao banco de dados');
+      return;
+    }
+});
+
+// Start o Service
 app.listen(8080, function () {
   console.log('Service ON');
 });
