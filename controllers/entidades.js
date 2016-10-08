@@ -36,6 +36,14 @@ function cadastrarEntidade (req, res, next) {
 
       });
 
+    } else {
+
+      res.status(400).json({
+        status: 400,
+        tipo: 'bad_request',
+        mensagem: 'Erro de parâmetro(s)'
+      });
+
     }
 
   } catch (e) {
@@ -77,6 +85,14 @@ function atualizarEntidade (req, res, next) {
           dados: dados
         });
 
+      });
+
+    } else {
+
+      res.status(400).json({
+        status: 400,
+        tipo: 'bad_request',
+        mensagem: 'Erro de parâmetro(s)'
       });
 
     }
