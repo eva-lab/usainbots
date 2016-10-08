@@ -7,10 +7,7 @@ var Entidade = require('../models/Entidade.js');
 // routes
 
 router.post('/entidade/cadastrar', cadastrarEntidade);
-
 router.put('/entidade/editar/:id', atualizarEntidade);
-
-router.get('/cliente/entidades/:id', pegarEntidades);
 
 
 // callback`s
@@ -83,53 +80,6 @@ function atualizarEntidade (req, res, next) {
       });
 
     }
-
-  } catch (e) {
-
-    res.status(500).json({
-      status: 500,
-      tipo: 'internal_server_error',
-      mensagem: 'Erro Interno'
-    });
-
-  }
-
-}
-
-function pegarEntidades (req, res, next) {
-
-  try {
-
-    Entidade.pegarPeloIdCliente(req.params.id, function(err, dados) {
-
-      if(err) {
-        res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de requisição'
-        });
-      }else{
-
-        console.log(dados);
-
-        if(dados._id){
-
-          res.status(200).json({
-            status: 200,
-            dados: dados
-          });
-
-        } else {
-          res.status(404).json({
-            status: 400,
-            tipo: 'not_found',
-            mensagem: 'Usuário não encontrado'
-          });
-        }
-
-      }
-
-    });
 
   } catch (e) {
 

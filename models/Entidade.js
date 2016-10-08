@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var exports  = module.exports;
 
 var entidadeSchema = new mongoose.Schema({
-  idCliente:      { type: String },
+  idUsuario:      { type: String },
   nome:           { type: String },
   url:            { type: String },
   textos:         { type: String },
@@ -23,7 +23,7 @@ exports.cadastrar = function(dados, callback) {
     }else {
       callback(false, {
         idEntidade : dados._id,
-        idCliente: dados.idCliente,
+        idUsuario: dados.idUsuario,
         nome: dados.nome,
         url: dados.url || null,
         textos: dados.textos || null,
@@ -75,9 +75,9 @@ exports.atualizar = function(dadosReq, callback) {
 };
 
 // Pegar entidades de um cliente
-exports.pegarPeloIdCliente = function(id, callback) {
+exports.pegarPeloIdUsuario = function(id, callback) {
 
-  Entidade.find({ 'idCliente' : id }, function (err, dados) {
+  Entidade.find({ 'idUsuario' : id }, function (err, dados) {
     // docs is an array
 
     if (err) {
@@ -86,19 +86,27 @@ exports.pegarPeloIdCliente = function(id, callback) {
 
       var entidades = [];
 
-      for (var i = 0; i < dados.length; i++) {
-        entidades.push({
-          script: dados[i].script || null,
-          textos: dados[i].textos || null,
-          url: dados[i].url || null
-        })
-      }
+      if(!dados[0]){
 
-      callback(false, {
-        _id: dados[0].idCliente,
-        nome: dados[0].nome,
-        entidades: entidades
-      });
+        callback(false, {});
+
+      } else {
+
+        for (var i = 0; i < dados.length; i++) {
+          entidades.push({
+            script: dados[i].script || null,
+            textos: dados[i].textos || null,
+            url: dados[i].url || null
+          })
+        }
+
+        callback(false, {
+          _id: dados[0].idUsuario,
+          nome: dados[0].nome,
+          entidades: entidades
+        });
+
+      }
 
     }
 
