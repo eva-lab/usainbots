@@ -60,7 +60,7 @@ function cadastrarUsuario (req, res, next) {
 
 function atualizarUsuario (req, res, next) {
 
-  // try {
+  try {
 
     if(req.body) {
 
@@ -97,15 +97,15 @@ function atualizarUsuario (req, res, next) {
 
     }
 
-  // } catch (e) {
-  //
-  //   res.status(500).json({
-  //     status: 500,
-  //     tipo: 'internal_server_error',
-  //     mensagem: 'Erro Interno'
-  //   });
-  //
-  // }
+  } catch (e) {
+
+    res.status(500).json({
+      status: 500,
+      tipo: 'internal_server_error',
+      mensagem: 'Erro Interno'
+    });
+
+  }
 
 }
 
