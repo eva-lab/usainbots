@@ -94,6 +94,8 @@ exports.pegarPeloIdUsuario = function(id, callback) {
 
         for (var i = 0; i < dados.length; i++) {
           entidades.push({
+            idEntidade: dados[i]._id,
+            nome: dados[i].nome,
             script: dados[i].script || null,
             textos: dados[i].textos || null,
             url: dados[i].url || null
@@ -101,7 +103,7 @@ exports.pegarPeloIdUsuario = function(id, callback) {
         }
 
         callback(false, {
-          _id: dados[0].idUsuario,
+          idUsuario: dados[0].idUsuario,
           nome: dados[0].nome,
           entidades: entidades
         });
