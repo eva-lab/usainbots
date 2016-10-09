@@ -75,7 +75,7 @@ exports.atualizar = function(dadosReq, callback) {
 };
 
 // Pegar entidades de um cliente
-exports.pegarPeloIdUsuario = function(id, callback) {
+exports.pegarPeloId = function(id, callback) {
 
   Entidade.find({ 'idUsuario' : id }, function (err, dados) {
     // docs is an array

@@ -1,33 +1,40 @@
-var mongoose = require('mongoose');
-var exports  = module.exports;
+var mongoose  = require('mongoose'),
+    bcrypt    = require('bcrypt-nodejs'),
+    jwt       = require('jsonwebtoken'),
+    exports   = module.exports;
 
 var usuarioSchema = new mongoose.Schema({
   nome:           { type: String },
   email:          { type: String },
-  senha:           { type: String }
+  senha:          { type: String },
+  token:          { type: String }
 });
 
 var Usuario =  mongoose.model('Usuario', usuarioSchema);
 
+exports.gerarToken = function(nome, email) {
+  return jwt.sign({'nome': nome, 'email': email}, 'segredo');
+};
+
+exports.generateHash = function(senha) {
+  return bcrypt.hashSync(senha, bcrypt.genSaltSync(8), null);
+};
+
+exports.validPassword = function(senha) {
+  return bcrypt.compareSync(senha, this.senha);
+};
+
 // Cadastrar um novo Usuário
-exports.cadastrar = function(dados, callback) {
+exports.criarUsuario = function(dados, callback) {
 
   var usuario = new Usuario(dados);
 
   usuario.save(function(err, dados){
 
     if(err) {
-
       callback(true, err);
-
     }else {
-
-      callback(false, {
-        idUsuario: dados._id,
-        nome: dados.nome,
-        email: dados.email
-      });
-
+      callback(false, usuario);
     }
 
   });
@@ -62,7 +69,8 @@ exports.atualizar = function(dadosReq, callback) {
             dados = {
               idUsuario: dados._id,
               nome: dados.nome,
-              email: dados.email
+              email: dados.email,
+              token: dados.token
             };
             callback(false, dados);
           }
@@ -74,29 +82,18 @@ exports.atualizar = function(dadosReq, callback) {
 
 };
 
-// Pegar entidades de um cliente
-exports.pegarPeloId = function(id, callback) {
+exports.pegarPeloEmail = function(dadosUsuario, callback) {
 
-  Entidade.find({ 'idUsuario' : id }, function (err, dados) {
+  Usuario.findOne({ 'email' : dadosUsuario.email }, function (err, dados) {
 
     if (err) {
-      callback(true, dados);
+      callback(true);
     } else {
 
-      var entidades = [];
-
       if(!dados){
-
-        callback(false, {});
-
+        callback(false);
       } else {
-
-        callback(false, {
-          idUsuario: dados.idUsuario,
-          nome: dados.nome,
-          email: dados.email
-        });
-
+        callback(false, dados);
       }
 
     }
