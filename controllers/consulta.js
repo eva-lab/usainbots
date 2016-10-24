@@ -2,15 +2,15 @@ var express     = require('express'),
     router      = express.Router(),
     RiveScript  = require('rivescript');
 
-router.get('/pesquisa', function(req, res, next) {
+router.get('/consulta', function(req, res, next) {
 
   var rive = new RiveScript();
 
   rive.loadFile([
     "files/cin.rive"
-  ], doneCallcack, erroCallback);
+  ], done, err);
 
-  function doneCallcack (batch_num) {
+  function done (batch_num) {
 
       rive.sortReplies();
       var reply = rive.reply("local-user", req.query.q);
@@ -20,7 +20,7 @@ router.get('/pesquisa', function(req, res, next) {
 
   }
 
-  function erroCallback (err) {
+  function err (err) {
 
     res.statusCode = 500;
     res.json({ dados : { statusCode: res.statusCode, mensagem: 'Erro interno' } });

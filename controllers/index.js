@@ -6,8 +6,9 @@ router.get('/', function(req, res, next) {
   res.send('Seja bem vindo(a) a API Usain Bot');
 });
 
-router.get('/crawler', function(req, res, next) {
-  crawler();
-});
+// router.get('/crawler', function(req, res, next) {
+//   crawler();
+//   res.send('Seja bem vindo(a) a API Usain Bot');
+// });
 
 module.exports = router;

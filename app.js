@@ -20,6 +20,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+// Control Access Origin
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*'); //TODO: Ajustar para aceitar apenas as aplicações com permissão
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
 //
 loader("controllers", function (files){
   for (var i = 0; i < files.length; i++) {
