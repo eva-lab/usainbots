@@ -5,7 +5,6 @@ var entidadeSchema = new mongoose.Schema({
   idUsuario:      { type: String },
   nome:           { type: String },
   url:            { type: String },
-  textos:         { type: String },
   script:         { type: String }
 });
 
@@ -25,8 +24,6 @@ exports.cadastrar = function(dados, callback) {
         idEntidade : dados._id,
         idUsuario: dados.idUsuario,
         nome: dados.nome,
-        url: dados.url || null,
-        textos: dados.textos || null,
         script: dados.script || null,
       });
     }
@@ -46,14 +43,6 @@ exports.atualizar = function(dadosReq, callback) {
 
         if (dadosReq.dados.nome) {
           dados.nome = dadosReq.dados.nome;
-        }
-
-        if (dadosReq.dados.url) {
-          dados.url = dadosReq.dados.url;
-        }
-
-        if (dadosReq.dados.textos) {
-          dados.textos = dadosReq.dados.textos;
         }
 
         if (dadosReq.dados.script) {
@@ -96,9 +85,7 @@ exports.pegarPeloId = function(id, callback) {
           entidades.push({
             idEntidade: dados[i]._id,
             nome: dados[i].nome,
-            script: dados[i].script || null,
-            textos: dados[i].textos || null,
-            url: dados[i].url || null
+            script: dados[i].script || null
           })
         }
 
@@ -112,6 +99,19 @@ exports.pegarPeloId = function(id, callback) {
 
     }
 
+  });
+
+};
+
+// Pegar entidades de um cliente
+exports.remover = function(id, callback) {
+
+  Entidade.remove({ '_id' : id }, function (err, dados) {
+    if (err) {
+      callback(true);
+    } else {
+      callback(false);
+    }
   });
 
 };
