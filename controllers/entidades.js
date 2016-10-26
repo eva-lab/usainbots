@@ -1,14 +1,13 @@
 var express     = require('express'),
-    router      = express.Router();
-
-// Model
-var Entidade = require('../models/Entidade.js');
+    router      = express.Router(),
+    auth        = require('../strategies/auth'),
+    Entidade = require('../models/Entidade.js');
 
 // routes
 
-router.post('/entidade/cadastrar', cadastrarEntidade);
-router.put('/entidade/editar/:id', atualizarEntidade);
-router.delete('/entidade/remover/:id', removerEntidade);
+router.post('/entidade/cadastrar',      auth.isAuthenticated, cadastrarEntidade);
+router.put('/entidade/editar/:id',      auth.isAuthenticated, atualizarEntidade);
+router.delete('/entidade/remover/:id',  auth.isAuthenticated, removerEntidade);
 
 
 // callback`s
