@@ -112,7 +112,7 @@ exports.signin =  function (req, res, next) {
         status: 200,
         mensagem: 'Login realizado',
         dados: {
-          idUsuario: dados._id,
+          idUsuario: dados.idUsuario,
           nome: dados.nome,
           email: dados.email,
           token: dados.token
