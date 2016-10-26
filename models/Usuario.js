@@ -17,13 +17,7 @@ exports.generateToken = function(email, secret, expiration) {
 };
 
 exports.verifyToken = function(token, secret) {
-  jwt.verify(token, secret, function (err,data) {
-
-    if(err) return true;
-
-    return false;
-
-  });
+  return jwt.verify(token, secret);
 };
 
 exports.generatePassword = function(senha) {
