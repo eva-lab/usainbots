@@ -1,27 +1,37 @@
 var mongoose  = require('mongoose'),
-    bcrypt    = require('bcrypt-nodejs'),
     jwt       = require('jsonwebtoken'),
+    bcrypt    = require('bcrypt-nodejs'),
     exports   = module.exports;
 
 var usuarioSchema = new mongoose.Schema({
-  nome:           { type: String },
-  email:          { type: String },
-  senha:          { type: String },
+  nome:           { type: String, require: true },
+  email:          { type: String, require: true, unique: true },
+  senha:          { type: String, require: true },
   token:          { type: String }
 });
 
 var Usuario =  mongoose.model('Usuario', usuarioSchema);
 
-exports.gerarToken = function(nome, email) {
-  return jwt.sign({'nome': nome, 'email': email}, 'segredo');
+exports.generateToken = function(email, secret, expiration) {
+  return jwt.sign({ 'email': email }, secret, { expiresIn : '10h' });
 };
 
-exports.generateHash = function(senha) {
-  return bcrypt.hashSync(senha, bcrypt.genSaltSync(8), null);
+exports.verifyToken = function(token, secret) {
+  jwt.verify(token, secret, function (err,data) {
+
+    if(err) return true;
+
+    return false;
+
+  });
 };
 
-exports.validPassword = function(senha) {
-  return bcrypt.compareSync(senha, this.senha);
+exports.generatePassword = function(senha) {
+  return bcrypt.hashSync(senha);
+};
+
+exports.comparePassword = function(senha, senhaBD) {
+  return bcrypt.compareSync(senha, senhaBD);
 };
 
 // Cadastrar um novo Usuário
@@ -50,16 +60,21 @@ exports.atualizar = function(dadosReq, callback) {
         callback(true, err);
       } else {
 
-        if (dadosReq.dados.nome) {
-          dados.nome = dadosReq.dados.nome;
+        if (dadosReq.nome) {
+          dados.nome = dadosReq.nome;
         }
 
-        if (dadosReq.dados.email) {
-          dados.email = dadosReq.dados.email;
+        if (dadosReq.email) {
+          dados.email = dadosReq.email;
         }
 
-        if (dadosReq.dados.senha) {
-          dados.senha = dadosReq.dados.senha;
+        if (dadosReq.senha) {
+          dados.senha = dadosReq.senha;
+        }
+
+        if (dadosReq.token) {
+          console.log(dados);
+          dados.token = dadosReq.token;
         }
 
         dados.save(function(err){
@@ -82,18 +97,18 @@ exports.atualizar = function(dadosReq, callback) {
 
 };
 
-exports.pegarPeloEmail = function(dadosUsuario, callback) {
+exports.pegarPeloEmail = function(email, callback) {
 
-  Usuario.findOne({ 'email' : dadosUsuario.email }, function (err, dados) {
+  Usuario.findOne({ 'email' : email }, function (err, user) {
 
     if (err) {
       callback(true);
     } else {
 
-      if(!dados){
+      if(!user){
         callback(false);
       } else {
-        callback(false, dados);
+        callback(false, user);
       }
 
     }
