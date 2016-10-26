@@ -3,23 +3,11 @@ var express       = require('express'),
     app           = express(),
     loader        = require('./lib/loader'),
     cookieParser  = require('cookie-parser'),
-    mongoose      = require('mongoose'),
-    passport      = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
-    session       = require('express-session');
+    mongoose      = require('mongoose');
 
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-  secret: 'j23ohjgxcdezw34H0i0f532zaqa2',
-  resave: true,
-  saveUninitialized: true,
-  cookie: { secure: true }
-}))
-app.use(passport.initialize());
-app.use(passport.session());
-
 
 // Control Access Origin
 app.use(function (req, res, next) {
@@ -45,9 +33,6 @@ mongoose.connect('mongodb://localhost/usainbot', function(err){
       return;
     }
 });
-
-require('./strategies/local-auth')(passport);
-
 
 // Start o Service
 app.listen(8080, function () {
