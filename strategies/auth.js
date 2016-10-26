@@ -9,9 +9,18 @@ exports.isAuthenticated = function(req, res, next) {
 
   var headers  = req.headers.authorization;
   var token    = null;
-  var bearer   =  headers.split(' ')[0].toLowerCase().trim();
 
-  if(!headers || bearer != "bearer") {
+  if(!headers){
+    return res.status(400).json({
+      status: 400,
+      tipo: 'bad_request',
+      mensagem: 'Erro de requisição'
+    });
+  }
+
+  var bearer = headers.split(' ')[0].toLowerCase().trim();
+
+  if(bearer != "bearer") {
     return res.status(400).json({
       status: 400,
       tipo: 'bad_request',
@@ -20,7 +29,6 @@ exports.isAuthenticated = function(req, res, next) {
   }
 
   token = headers.split('Bearer').pop().trim();
-
   var tokenValido = Usuario.verifyToken(token, config.secret.tokenSecret);
 
   if(!tokenValido) {
