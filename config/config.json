@@ -1,0 +1,12 @@
+{
+  "name": "API - UsainBot",
+  "version": "1.0.0",
+  "host": "http://localhost:8080/",
+  "secret": {
+    "tokenSecret" : "cufFz2Y7q734w011c3fMgOmje2XN4SH6"
+  },
+  "bd": {
+    "host": "mongodb://localhost/",
+    "name": "usainbot"
+  }
+}

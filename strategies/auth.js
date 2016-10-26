@@ -1,9 +1,8 @@
 
 var jwt       = require('jsonwebtoken'),
     exports   = module.exports,
-    Usuario   = require('../models/Usuario.js'),
-    secret    = 'cufFz2Y7q734w011c3fMgOmje2XN4SH6';
-
+    Usuario   = require('../models/Usuario'),
+    config    = require('../config/config');
 
 // Verificar validade do Token
 exports.isAuthenticated = function(req, res, next) {
@@ -22,7 +21,7 @@ exports.isAuthenticated = function(req, res, next) {
 
   token = headers.split('Bearer').pop().trim();
 
-  var tokenValido = Usuario.verifyToken(token, secret);
+  var tokenValido = Usuario.verifyToken(token, config.secret.tokenSecret);
 
   if(!tokenValido) {
     res.status(401).json({
@@ -36,14 +35,13 @@ exports.isAuthenticated = function(req, res, next) {
 
 }
 
-
 // Cadastro
 exports.signup =  function (req, res, next) {
 
   if(req.body && req.body.nome && req.body.email && req.body.senha) {
 
     var dados = req.body;
-    dados.token = Usuario.generateToken(req.body.email, secret);
+    dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
     dados.senha = Usuario.generatePassword(req.body.senha);
 
     Usuario.criarUsuario(dados, function(err, dados) {
@@ -72,7 +70,6 @@ exports.signup =  function (req, res, next) {
 
 }
 
-
 // Login
 exports.signin =  function (req, res, next) {
 
@@ -93,7 +90,7 @@ exports.signin =  function (req, res, next) {
       });
     }
 
-    dados.token = Usuario.generateToken(req.body.email, secret);
+    dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
 
     Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dados){
 
