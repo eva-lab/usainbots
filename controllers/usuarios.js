@@ -68,7 +68,7 @@ function pegarEntidadesUsuario (req, res, next) {
 
   try {
 
-    Entidade.pegarPeloId(req.params.id, function(err, dados) {
+    Entidade.pegarPeloIdUsuario(req.params.id, function(err, dados) {
 
       if(err) {
         res.status(400).json({
@@ -76,9 +76,9 @@ function pegarEntidadesUsuario (req, res, next) {
           tipo: 'bad_request',
           mensagem: 'Erro de requisição'
         });
-      }else{
+      } else {
 
-        if(dados.idUsuario){
+        if(dados){
 
           res.status(200).json({
             status: 200,
@@ -86,11 +86,13 @@ function pegarEntidadesUsuario (req, res, next) {
           });
 
         } else {
-          res.status(404).json({
+
+          res.status(400).json({
             status: 400,
             tipo: 'not_found',
             mensagem: 'Usuário não encontrado'
           });
+
         }
 
       }
