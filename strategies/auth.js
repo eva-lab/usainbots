@@ -83,7 +83,8 @@ exports.signin =  function (req, res, next) {
 
   Usuario.pegarPeloEmail(req.body.email, function(err, dados){
 
-    if(err) res.status(200).json({
+
+    if(err) return res.status(200).json({
       status: 200,
       mensagem: 'Usuário não encontrado',
       dados: dados
@@ -92,7 +93,7 @@ exports.signin =  function (req, res, next) {
     var confirmaSenha = Usuario.comparePassword(req.body.senha, dados.senha);
 
     if(!confirmaSenha) {
-      res.status(200).json({
+      return res.status(200).json({
         status: 200,
         mensagem: 'Autenticação inválida'
       });
@@ -108,7 +109,7 @@ exports.signin =  function (req, res, next) {
         mensagem: 'Erro Interno'
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: 200,
         mensagem: 'Login realizado',
         dados: {
