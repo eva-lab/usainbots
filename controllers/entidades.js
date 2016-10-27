@@ -113,7 +113,8 @@ function removerEntidade (req, res, next) {
 
   try {
 
-    if(req.body) {
+    if(req.params.id) {
+
 
       Entidade.remover(req.params.id, function(err){
 
@@ -123,12 +124,12 @@ function removerEntidade (req, res, next) {
             tipo: 'bad_request',
             mensagem: 'Erro de requisição'
           });
+        } else {
+          res.status(200).json({
+            status: 200,
+            mensagem: 'Entidade removida com sucesso',
+          });
         }
-
-        res.status(200).json({
-          status: 200,
-          mensagem: 'Entidade atualizada com sucesso',
-        });
 
       });
 
