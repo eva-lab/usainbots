@@ -83,8 +83,7 @@ exports.signin =  function (req, res, next) {
 
   Usuario.pegarPeloEmail(req.body.email, function(err, dados){
 
-
-    if(err) return res.status(200).json({
+    if(err || !dados) return res.status(200).json({
       status: 200,
       mensagem: 'Usuário não encontrado',
       dados: dados
