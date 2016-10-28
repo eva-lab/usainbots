@@ -29,17 +29,30 @@ exports.isAuthenticated = function(req, res, next) {
   }
 
   token = headers.split('Bearer').pop().trim();
-  var tokenValido = Usuario.verifyToken(token, config.secret.tokenSecret);
+  Usuario.verifyToken(token, config.secret.tokenSecret, function(err, decoded){
 
-  if(!tokenValido) {
-    res.status(401).json({
-      status: 401,
-      tipo: 'unauthorized',
-      mensagem: 'Usuário não autorizado'
-    });
-  } else {
-    next();
-  }
+    if (err) {
+
+      if (err.name == 'TokenExpiredError') {
+        console.log('2');
+        return res.status(401).json({
+          status: 401,
+          tipo: 'token_expired',
+          mensagem: 'Token expirado'
+        });
+      } else {
+        return res.status(401).json({
+          status: 401,
+          tipo: 'unauthorized',
+          mensagem: 'Usuário não autorizado'
+        });
+      }
+
+    } else {
+      next();
+    }
+
+  });
 
 }
 
@@ -54,17 +67,19 @@ exports.signup =  function (req, res, next) {
 
     Usuario.criarUsuario(dados, function(err, dados) {
 
-      if (err) return res.status(200).json({
-        status: 200,
-        tipo: 'duplicated_email',
-        mensagem: 'E-mail já cadastrado'
-      });
-
-      res.status(200).json({
-        status: 200,
-        mensagem: 'Usuário cadastrado com sucesso',
-        dados: dados
-      });
+      if (err) {
+        return res.status(200).json({
+          status: 200,
+          tipo: 'duplicated_email',
+          mensagem: 'E-mail já cadastrado'
+        });
+      } else {
+        return res.status(200).json({
+          status: 200,
+          mensagem: 'Usuário cadastrado com sucesso',
+          dados: dados
+        });
+      }
 
     });
 
@@ -102,22 +117,24 @@ exports.signin =  function (req, res, next) {
 
     Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dados){
 
-      if (err) res.status(500).json({
-        status: 500,
-        tipo: 'internal_server_error',
-        mensagem: 'Erro Interno'
-      });
-
-      return res.status(200).json({
-        status: 200,
-        mensagem: 'Login realizado',
-        dados: {
-          idUsuario: dados.idUsuario,
-          nome: dados.nome,
-          email: dados.email,
-          token: dados.token
-        }
-      });
+      if (err) {
+        return res.status(500).json({
+          status: 500,
+          tipo: 'internal_server_error',
+          mensagem: 'Erro Interno'
+        });
+      } else {
+        return res.status(200).json({
+          status: 200,
+          mensagem: 'Login realizado',
+          dados: {
+            idUsuario: dados.idUsuario,
+            nome: dados.nome,
+            email: dados.email,
+            token: dados.token
+          }
+        });
+      }
 
     });
 

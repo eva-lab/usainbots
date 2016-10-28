@@ -16,8 +16,14 @@ exports.generateToken = function(email, secret, expiration) {
   return jwt.sign({ 'email': email }, secret, { expiresIn : '10h' });
 };
 
-exports.verifyToken = function(token, secret) {
-  return jwt.verify(token, secret);
+exports.verifyToken = function(token, secret, callback) {
+  jwt.verify(token, secret, function(err, decoded) {
+    if(err) {
+      callback(err);
+    } else {
+      callback(false, decoded);
+    }
+  });
 };
 
 exports.generatePassword = function(senha) {
