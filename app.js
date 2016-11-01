@@ -30,12 +30,14 @@ loader.loadRequire("controllers", function (files){
 mongoose.Promise = global.Promise;
 mongoose.connect(config.bd.host + config.bd.name, function(err){
   if(err){
-    console.log('Não foi possível conectar ao banco de dados');
+    console.log('. não foi possível conectar ao banco de dados');
     return;
+  } else {
+    console.log('. banco de dados conectado.')
   }
 });
 
 // Start o Service
-app.listen(8080, function () {
-  console.log('Service ON');
+app.listen(config.port, function () {
+  console.log('. sevico rodando na porta ' + config.port);
 });
