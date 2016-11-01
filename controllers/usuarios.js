@@ -1,17 +1,18 @@
 var express     = require('express'),
     router      = express.Router(),
     Usuario     = require('../models/Usuario'),
-    Entidade    = require('../models/Entidade'),
-    auth        = require('../strategies/auth');
+    Script    = require('../models/Script'),
+    auth        = require('../strategies/auth'),
+    Bot       = require('../models/Bot');
 
-// routes
+// rotas
 
 router.post('/usuario/cadastrar',     auth.signup);
 router.put('/usuario/editar/:id',     auth.isAuthenticated, atualizarUsuario);
-router.get('/usuario/:id/entidades',  auth.isAuthenticated, pegarEntidadesUsuario);
 router.post('/usuario/login',         auth.signin);
+router.get('/usuario/:id/bots/',       auth.isAuthenticated, pegarBotsUsuarioPeloId);
 
-// callback`s
+// funcoes
 
 function atualizarUsuario (req, res, next) {
 
@@ -64,50 +65,22 @@ function atualizarUsuario (req, res, next) {
 
 }
 
-function pegarEntidadesUsuario (req, res, next) {
+function pegarBotsUsuarioPeloId (req, res, next) {
 
-  try {
+  Bot.pegarPeloIdUsuario(req.params.id, function(err, dadosBot){
 
-    Entidade.pegarPeloIdUsuario(req.params.id, function(err, dados) {
-
-      if(err) {
-        res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de requisição'
-        });
-      } else {
-
-        if(dados){
-
-          res.status(200).json({
-            status: 200,
-            dados: dados
-          });
-
-        } else {
-
-          res.status(400).json({
-            status: 400,
-            tipo: 'not_found',
-            mensagem: 'Usuário não encontrado'
-          });
-
-        }
-
-      }
-
-    });
-
-  } catch (e) {
-
-    res.status(500).json({
+    if(err) return res.status(500).json({
       status: 500,
       tipo: 'internal_server_error',
       mensagem: 'Erro Interno'
     });
 
-  }
+    res.status(200).json({
+      status: 200,
+      dados: dadosBot
+    });
+
+  });
 
 }
 
