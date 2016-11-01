@@ -8,7 +8,7 @@ var express     = require('express'),
 
 router.post('/bot/cadastrar',       auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',    auth.isAuthenticated, atualizar);
-router.get('/bot/:id/consulta',     auth.isAuthenticated, consultar);
+router.get('/bot/:id/consulta',     consultar);
 router.delete('/bot/:id/remover',   auth.isAuthenticated, remover);
 router.get('/bot/:id/scripts',      auth.isAuthenticated, pegarScripts);
 
@@ -112,7 +112,7 @@ function consultar (req, res, next) {
         mensagem: 'Bot não encontrado'
       });
     } else {
-      
+
       var rive = new RiveScript();
 
       rive.loadFile(dados, done, error);
