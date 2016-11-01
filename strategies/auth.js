@@ -1,8 +1,9 @@
 
 var jwt       = require('jsonwebtoken'),
     exports   = module.exports,
+    config    = require('../config/config'),
     Usuario   = require('../models/Usuario'),
-    config    = require('../config/config');
+    Script    = require('../models/Script');
 
 // Verificar validade do Token
 exports.isAuthenticated = function(req, res, next) {
@@ -34,7 +35,6 @@ exports.isAuthenticated = function(req, res, next) {
     if (err) {
 
       if (err.name == 'TokenExpiredError') {
-        console.log('2');
         return res.status(401).json({
           status: 401,
           tipo: 'token_expired',
@@ -98,45 +98,50 @@ exports.signin =  function (req, res, next) {
 
   Usuario.pegarPeloEmail(req.body.email, function(err, dados){
 
-    if(err || !dados) return res.status(200).json({
-      status: 200,
-      mensagem: 'Usuário não encontrado',
-      dados: dados
-    });
-
-    var confirmaSenha = Usuario.comparePassword(req.body.senha, dados.senha);
-
-    if(!confirmaSenha) {
+    if(err || !dados) {
       return res.status(200).json({
         status: 200,
-        mensagem: 'Autenticação inválida'
+        mensagem: 'Usuário não encontrado',
+        dados: dados
       });
-    }
+    } else {
 
-    dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
+      var confirmaSenha = Usuario.comparePassword(req.body.senha, dados.senha);
 
-    Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dados){
-
-      if (err) {
-        return res.status(500).json({
-          status: 500,
-          tipo: 'internal_server_error',
-          mensagem: 'Erro Interno'
-        });
-      } else {
+      if(!confirmaSenha) {
         return res.status(200).json({
           status: 200,
-          mensagem: 'Login realizado',
-          dados: {
-            idUsuario: dados.idUsuario,
-            nome: dados.nome,
-            email: dados.email,
-            token: dados.token
-          }
+          mensagem: 'Autenticação inválida'
         });
       }
 
-    });
+      dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
+
+      Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dadosUsuario){
+
+        if (err) {
+          return res.status(500).json({
+            status: 500,
+            tipo: 'internal_server_error',
+            mensagem: 'Erro Interno'
+          });
+        } else {
+
+          return res.status(200).json({
+            status: 200,
+            dados: {
+              id: dadosUsuario.idUsuario,
+              nome: dadosUsuario.nome,
+              email: dadosUsuario.email,
+              token: dadosUsuario.token,
+            }
+          });
+
+        }
+
+      });
+
+    }
 
   });
 
