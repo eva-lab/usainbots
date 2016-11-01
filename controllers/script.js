@@ -1,24 +1,21 @@
 var express     = require('express'),
     router      = express.Router(),
     auth        = require('../strategies/auth'),
-    Entidade = require('../models/Entidade.js');
+    Script      = require('../models/Script');
 
-// routes
+// routas
+router.post('/script/cadastrar',      auth.isAuthenticated, cadastrar);
+router.put('/script/:id/atualizar',   auth.isAuthenticated, atualizar);
+router.delete('/script/:id/remover',  auth.isAuthenticated, remover);
 
-router.post('/entidade/cadastrar',      auth.isAuthenticated, cadastrarEntidade);
-router.put('/entidade/editar/:id',      auth.isAuthenticated, atualizarEntidade);
-router.delete('/entidade/remover/:id',  auth.isAuthenticated, removerEntidade);
-
-
-// callback`s
-
-function cadastrarEntidade (req, res, next) {
+// funcoes
+function cadastrar (req, res, next) {
 
   try {
 
     if(req.body.dados) {
 
-      Entidade.cadastrar(req.body.dados, function(err, dados){
+      Script.cadastrar(req.body.dados, function(err, dados){
 
         if(err) {
           res.status(400).json({
@@ -30,7 +27,7 @@ function cadastrarEntidade (req, res, next) {
 
         res.status(200).json({
           status: 200,
-          mensagem: 'Entidade salva com sucesso',
+          mensagem: 'Script salva com sucesso',
           dados: dados
         });
 
@@ -58,18 +55,18 @@ function cadastrarEntidade (req, res, next) {
 
 }
 
-function atualizarEntidade (req, res, next) {
+function atualizar (req, res, next) {
 
   try {
 
     if(req.body.dados) {
 
       var dados = {
-        idEntidade : req.params.id,
+        idScript : req.params.id,
         dados: req.body.dados
       };
 
-      Entidade.atualizar(dados, function(err, dados){
+      Script.atualizar(dados, function(err, dados){
 
         if(err) {
           res.status(400).json({
@@ -77,13 +74,13 @@ function atualizarEntidade (req, res, next) {
             tipo: 'bad_request',
             mensagem: 'Erro de requisição'
           });
+        } else {
+          res.status(200).json({
+            status: 200,
+            mensagem: 'Script atualizada com sucesso',
+            dados: dados
+          });
         }
-
-        res.status(200).json({
-          status: 200,
-          mensagem: 'Entidade atualizada com sucesso',
-          dados: dados
-        });
 
       });
 
@@ -109,14 +106,14 @@ function atualizarEntidade (req, res, next) {
 
 }
 
-function removerEntidade (req, res, next) {
+function remover (req, res, next) {
 
   try {
 
     if(req.params.id) {
 
 
-      Entidade.remover(req.params.id, function(err){
+      Script.remover(req.params.id, function(err){
 
         if(err) {
           res.status(400).json({
@@ -127,7 +124,7 @@ function removerEntidade (req, res, next) {
         } else {
           res.status(200).json({
             status: 200,
-            mensagem: 'Entidade removida com sucesso',
+            mensagem: 'Script removida com sucesso',
           });
         }
 
