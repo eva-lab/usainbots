@@ -1,7 +1,7 @@
 {
   "name": "usain-bot-api",
   "version": "1.0.0",
-  "description": "Serviço dedicado a bots do Centro de Informática da Universidade Federal de Pernambuco",
+  "description": "API Restful dedicada ao serviço de criação e gerenciamento de bots escritos com .rivescript",
   "main": "app.js",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -13,6 +13,7 @@
     "file-system": "^2.2.1",
     "html2json": "^1.0.2",
     "jsonwebtoken": "^7.1.9",
+    "moment": "^2.15.2",
     "mongoose": "*",
     "request": "^2.75.0",
     "rivescript": "^1.16.0",
