@@ -4,7 +4,8 @@ var exports  = module.exports;
 var entidadeSchema = new mongoose.Schema({
   idBot:    { type: String, require: true },
   nome:     { type: String, require: true },
-  conteudo: { type: String, require: true }
+  conteudo: { type: String, require: true },
+  nomeArquivo:  { type: String, require: true }
 });
 
 var Script =  mongoose.model('Script', entidadeSchema);
@@ -20,10 +21,11 @@ exports.cadastrar = function(dados, callback) {
       callback(true, err);
     }else {
       callback(false, {
-        idScript : dados._id,
-        idBot: dados.idBot,
-        nome: dados.nome,
-        conteudo: dados.conteudo || null,
+        idScript :    dados._id,
+        idBot:        dados.idBot,
+        nome:         dados.nome,
+        conteudo:     dados.conteudo || null,
+        nomeArquivo:  dados.nomeArquivo
       });
     }
 
@@ -52,7 +54,13 @@ exports.atualizar = function(dadosReq, callback) {
           if(err){
             callback(true, err);
           } else {
-            callback(false, dados);
+            callback(false, {
+              idScript :    dados._id,
+              idBot:        dados.idBot,
+              nome:         dados.nome,
+              conteudo:     dados.conteudo || null,
+              nomeArquivo:  dados.nomeArquivo
+            });
           }
         });
 
@@ -65,9 +73,7 @@ exports.atualizar = function(dadosReq, callback) {
 // Remover Script
 exports.remover = function(id, callback) {
 
-  console.log(id);
-
-  Script.remove({ '_id' : id }, function (err, dados) {
+  Script.remove({ '_id' : id }, function (err) {
     if (err) {
       callback(true);
     } else {
@@ -78,7 +84,7 @@ exports.remover = function(id, callback) {
 };
 
 // Pegar script pelo Id do Bot
-  exports.pegarPeloIdBot = function(id, callback) {
+exports.pegarPeloIdBot = function(id, callback) {
 
   Script.find({ 'idBot' : id }, function (err, dadosScript) {
 
@@ -95,8 +101,34 @@ exports.remover = function(id, callback) {
             idScript: dadosScript[i]._id,
             idBot:    dadosScript[i].idBot,
             nome:     dadosScript[i].nome,
-            conteudo: dadosScript[i].conteudo
+            conteudo: dadosScript[i].conteudo,
+            nomeArquivo:  dadosScript[i].nomeArquivo
           });
+        }
+        callback(false, dados);
+      }
+
+    }
+
+  });
+
+};
+
+// Pegar script pelo Id do Bot
+exports.pegarArquivosPeloIdBot = function(id, callback) {
+
+  Script.find({ 'idBot' : id }, function (err, dadosScript) {
+
+    if (err) {
+      callback(true);
+    } else {
+
+      if(!dadosScript){
+        callback(false);
+      } else {
+        var dados = [];
+        for (var i = 0; i < dadosScript.length; i++) {
+          dados.push("files/" + dadosScript[i].nomeArquivo);
         }
         callback(false, dados);
       }

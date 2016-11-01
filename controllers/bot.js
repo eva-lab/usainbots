@@ -103,28 +103,39 @@ function atualizar (req, res, next) {
 
 function consultar (req, res, next) {
 
-  var rive = new RiveScript();
+  Script.pegarArquivosPeloIdBot(req.params.id, function(err, dados) {
 
-  rive.loadFile([
-    "files/cin.rive"
-  ], done, err);
+    if(err) {
+      res.status(404).json({
+        status: 404,
+        tipo: 'not_found',
+        mensagem: 'Bot não encontrado'
+      });
+    } else {
+      
+      var rive = new RiveScript();
 
-  function done (batch_num) {
+      rive.loadFile(dados, done, error);
 
-      rive.sortReplies();
-      var reply = rive.reply("local-user", req.query.q);
+      function done (batch_num) {
 
-      res.statusCode = 200;
-      res.json({  dados: { statusCode: res.statusCode, mensagem: reply }});
+          rive.sortReplies();
+          var reply = rive.reply("local-user", req.query.q);
 
-  }
+          res.statusCode = 200;
+          res.json({  dados: { statusCode: res.statusCode, mensagem: reply }});
 
-  function err (err) {
+      }
 
-    res.statusCode = 500;
-    res.json({ dados : { statusCode: res.statusCode, mensagem: 'Erro interno' } });
+      function error (error) {
 
-  }
+        res.statusCode = 500;
+        res.json({ dados : { statusCode: res.statusCode, mensagem: 'Erro interno' } });
+
+      }
+    }
+
+  });
 
 }
 
