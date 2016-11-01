@@ -7,7 +7,7 @@ var usuarioSchema = new mongoose.Schema({
   nome:           { type: String, require: true },
   email:          { type: String, require: true, unique: true },
   senha:          { type: String, require: true },
-  token:          { type: String }
+  token:          { type: String, require: true }
 });
 
 var Usuario =  mongoose.model('Usuario', usuarioSchema);
