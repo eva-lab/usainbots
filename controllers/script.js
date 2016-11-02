@@ -104,9 +104,9 @@ function remover (req, res, next) {
 
   if(req.params.id) {
 
-    Script.remover(req.params.id, function(err, dados){
+    Script.remover(req.params.id, function(err){
 
-      if(err || !dados) {
+      if(err ) {
         res.status(404).json({
           erro: 'not_found',
           mensagem: 'Script não encontrado'
