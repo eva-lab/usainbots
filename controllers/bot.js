@@ -21,17 +21,15 @@ function cadastrar (req, res, next) {
 
     Bot.cadastrar(dadosReq, function(err, dados){
 
-      if(err) {
+      if(err || !dados) {
         res.status(404).json({
-          status: 404,
-          tipo: 'not_found',
+          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       } else {
         res.status(200).json({
-          status: 200,
-          mensagem: 'Bot salvo com sucesso',
-          dados: dados
+          dados: dados,
+          mensagem: 'Bot salvo com sucesso'
         });
       }
 
@@ -40,8 +38,7 @@ function cadastrar (req, res, next) {
   } else {
 
     res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
+      erro: 'bad_request',
       mensagem: 'Erro de parâmetro(s)'
     });
 
@@ -60,10 +57,9 @@ function atualizar (req, res, next) {
 
     Bot.atualizar(dadosReq, function(err, dados) {
 
-      if(err) {
+      if(err || !dados) {
         res.status(404).json({
-          status: 404,
-          tipo: 'not_found',
+          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       } else {
@@ -71,16 +67,15 @@ function atualizar (req, res, next) {
         if(dados){
 
           res.status(200).json({
-            status: 200,
-            dados: dados
+            dados: dados,
+            mensagem: 'Bot atualizado com sucesso'
           });
 
         } else {
 
-          res.status(400).json({
-            status: 400,
-            tipo: 'not_found',
-            mensagem: 'Usuário não encontrado'
+          res.status(404).json({
+            erro: 'not_found',
+            mensagem: 'Bot não encontrado'
           });
 
         }
@@ -92,9 +87,8 @@ function atualizar (req, res, next) {
   } else {
 
     res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
-      mensagem: 'Erro de requisição'
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
     });
 
   }
@@ -103,39 +97,47 @@ function atualizar (req, res, next) {
 
 function consultar (req, res, next) {
 
-  Script.pegarArquivosPeloIdBot(req.params.id, function(err, dados) {
+  if(req.params.id && req.query.q) {
 
-    if(err) {
-      res.status(404).json({
-        status: 404,
-        tipo: 'not_found',
-        mensagem: 'Bot não encontrado'
-      });
-    } else {
+    Script.pegarArquivosPeloIdBot(req.params.id, function(err, dados) {
 
-      var rive = new RiveScript();
+      if(err || !dados) {
+        res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Bot não encontrado'
+        });
+      } else {
 
-      rive.loadFile(dados, done, error);
+        var rive = new RiveScript();
 
-      function done (batch_num) {
+        rive.loadFile(dados, done, error);
 
-          rive.sortReplies();
-          var reply = rive.reply("local-user", req.query.q);
+        function done (batch_num) {
 
-          res.statusCode = 200;
-          res.json({  dados: { statusCode: res.statusCode, mensagem: reply }});
+            rive.sortReplies();
+            var reply = rive.reply("local-user", req.query.q);
 
+            res.statusCode = 200;
+            res.json({ mensagem: reply });
+
+        }
+
+        function error (error) {
+
+          res.statusCode = 500;
+          res.json({ mensagem: 'Erro interno' });
+
+        }
       }
 
-      function error (error) {
+    });
 
-        res.statusCode = 500;
-        res.json({ dados : { statusCode: res.statusCode, mensagem: 'Erro interno' } });
-
-      }
-    }
-
-  });
+  } else {
+    res.status(400).json({
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
+    });
+  }
 
 }
 
@@ -146,14 +148,12 @@ function remover (req, res, next) {
     Bot.remover(req.params.id, function(err){
 
       if(err) {
-        res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de requisição'
+        res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Bot não encontrado'
         });
       } else {
         res.status(200).json({
-          status: 200,
           mensagem: 'Bot removido com sucesso',
         });
       }
@@ -163,9 +163,8 @@ function remover (req, res, next) {
   } else {
 
     res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
-      mensagem: 'Erro de parâmetro(s)'
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
     });
 
   }
@@ -178,21 +177,28 @@ function pegarScripts (req, res, next) {
 
     Script.pegarPeloIdBot(req.params.id, function(err, dados){
 
-      if(err) {
+      if(err || !dados) {
         res.status(404).json({
-          status: 404,
-          tipo: 'not_found',
+          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       } else {
         res.status(200).json({
-          status: 200,
           dados: dados
         });
       }
 
     });
+
+  } else {
+
+    res.status(400).json({
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
+    });
+
   }
+
 }
 
 module.exports = router;

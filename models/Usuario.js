@@ -44,7 +44,12 @@ exports.criarUsuario = function(dados, callback) {
     if(err) {
       callback(true, err);
     }else {
-      callback(false, usuario);
+      callback(false, {
+        idUsuario:  usuario._id,
+        nome:  usuario.nome,
+        email: usuario.email,
+        token: usuario.token
+      });
     }
 
   });
@@ -73,7 +78,6 @@ exports.atualizar = function(dadosReq, callback) {
         }
 
         if (dadosReq.token) {
-          console.log(dados);
           dados.token = dadosReq.token;
         }
 

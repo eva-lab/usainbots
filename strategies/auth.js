@@ -1,9 +1,9 @@
 
 var jwt       = require('jsonwebtoken'),
-    exports   = module.exports,
     config    = require('../config/config'),
     Usuario   = require('../models/Usuario'),
-    Script    = require('../models/Script');
+    Script    = require('../models/Script'),
+    exports   = module.exports;
 
 // Verificar validade do Token
 exports.isAuthenticated = function(req, res, next) {
@@ -14,7 +14,7 @@ exports.isAuthenticated = function(req, res, next) {
   if(!headers){
     return res.status(400).json({
       status: 400,
-      tipo: 'bad_request',
+      erro: 'bad_request',
       mensagem: 'Erro de requisição'
     });
   }
@@ -24,7 +24,7 @@ exports.isAuthenticated = function(req, res, next) {
   if(bearer != "bearer") {
     return res.status(400).json({
       status: 400,
-      tipo: 'bad_request',
+      erro: 'bad_request',
       mensagem: 'Erro de requisição'
     });
   }
@@ -36,14 +36,12 @@ exports.isAuthenticated = function(req, res, next) {
 
       if (err.name == 'TokenExpiredError') {
         return res.status(401).json({
-          status: 401,
-          tipo: 'token_expired',
+          erro:     'unauthorized',
           mensagem: 'Token expirado'
         });
       } else {
         return res.status(401).json({
-          status: 401,
-          tipo: 'unauthorized',
+          erro:     'unauthorized',
           mensagem: 'Usuário não autorizado'
         });
       }
@@ -56,28 +54,27 @@ exports.isAuthenticated = function(req, res, next) {
 
 }
 
+// TODO: Inserir dados na aplicacao
 // Cadastro
 exports.signup =  function (req, res, next) {
 
-  if(req.body && req.body.nome && req.body.email && req.body.senha) {
+  if(req.body.dados && req.body.dados.nome && req.body.dados.email && req.body.dados.senha) {
 
-    var dados = req.body;
-    dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
-    dados.senha = Usuario.generatePassword(req.body.senha);
+    var dados = req.body.dados;
+    dados.token = Usuario.generateToken(dados.email, config.secret.tokenSecret);
+    dados.senha = Usuario.generatePassword(dados.senha);
 
-    Usuario.criarUsuario(dados, function(err, dados) {
+    Usuario.criarUsuario(dados, function(err, dadosUsuario) {
 
       if (err) {
-        return res.status(200).json({
-          status: 200,
-          tipo: 'duplicated_email',
-          mensagem: 'E-mail já cadastrado'
+        return res.status(202).json({
+          erro: 'invalid_credentials',
+          mensagem: 'Credenciais inválidas'
         });
       } else {
         return res.status(200).json({
-          status: 200,
           mensagem: 'Usuário cadastrado com sucesso',
-          dados: dados
+          dados: dadosUsuario
         });
       }
 
@@ -85,8 +82,7 @@ exports.signup =  function (req, res, next) {
 
   } else {
     return res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
+      erro: 'bad_request',
       mensagem: 'Erro de requisição'
     });
   }
@@ -96,53 +92,60 @@ exports.signup =  function (req, res, next) {
 // Login
 exports.signin =  function (req, res, next) {
 
-  Usuario.pegarPeloEmail(req.body.email, function(err, dados){
+  if(req.body.dados && req.body.dados.email && req.body.dados.senha) {
 
-    if(err || !dados) {
-      return res.status(200).json({
-        status: 200,
-        mensagem: 'Usuário não encontrado',
-        dados: dados
-      });
-    } else {
+      Usuario.pegarPeloEmail(req.body.dados.email, function(err, dados){
 
-      var confirmaSenha = Usuario.comparePassword(req.body.senha, dados.senha);
-
-      if(!confirmaSenha) {
-        return res.status(200).json({
-          status: 200,
-          mensagem: 'Autenticação inválida'
-        });
-      }
-
-      dados.token = Usuario.generateToken(req.body.email, config.secret.tokenSecret);
-
-      Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dadosUsuario){
-
-        if (err) {
-          return res.status(500).json({
-            status: 500,
-            tipo: 'internal_server_error',
-            mensagem: 'Erro Interno'
+        if(err || !dados) {
+          return res.status(404).json({
+            erro:     'not_found',
+            mensagem: 'Usuário não encontrado'
           });
         } else {
 
-          return res.status(200).json({
-            status: 200,
-            dados: {
-              id: dadosUsuario.idUsuario,
-              nome: dadosUsuario.nome,
-              email: dadosUsuario.email,
-              token: dadosUsuario.token,
+          var confirmaSenha = Usuario.comparePassword(req.body.dados.senha, dados.senha);
+
+          if(!confirmaSenha) {
+            return res.status(202).json({
+              erro:     'invalid_credentials',
+              mensagem: 'Credenciais inválidas'
+            });
+          }
+
+          dados.token = Usuario.generateToken(req.body.dados.email, config.secret.tokenSecret);
+
+          Usuario.atualizar({ idUsuario: dados._id ,token: dados.token }, function(err, dadosUsuario){
+
+            if (err) {
+              return res.status(500).json({
+                erro: 'internal_server_error',
+                mensagem: 'Erro Interno'
+              });
+            } else {
+
+              return res.status(200).json({
+                dados: {
+                  idUsuario: dadosUsuario.idUsuario,
+                  nome: dadosUsuario.nome,
+                  email: dadosUsuario.email,
+                  token: dadosUsuario.token,
+                }
+              });
+
             }
+
           });
 
         }
 
       });
 
-    }
-
-  });
+  } else {
+    res.status(400).json({
+      status: 400,
+      erro: 'bad_request',
+      mensagem: 'Erro de parâmetro(s)'
+    });
+  }
 
 }

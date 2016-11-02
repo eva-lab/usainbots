@@ -21,25 +21,22 @@ function cadastrar (req, res, next) {
 
     Script.cadastrar(dados, function(err, dadosScript){
 
-      if(err) {
-        res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de parâmetro(s)'
+      if(err || !dadosScript) {
+        return res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Script não encontrado'
         });
       }
 
       fs.writeFile('./files/' + dados.nomeArquivo, dados.conteudo, function(err){
 
         if(err) return res.status(500).json({
-          status: 500,
-          ipo: 'internal_server_error',
+          erro: 'internal_server_error',
           mensagem: 'Erro Interno'
         });
 
         res.status(200).json({
-          status: 200,
-          mensagem: 'Script salva com sucesso',
+          mensagem: 'Script salvo com sucesso',
           dados: dadosScript
         });
 
@@ -50,9 +47,8 @@ function cadastrar (req, res, next) {
   } else {
 
     res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
-      mensagem: 'Erro de parâmetro(s)'
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
     });
 
   }
@@ -70,24 +66,21 @@ function atualizar (req, res, next) {
 
     Script.atualizar(dados, function(err, dadosScript){
 
-      if(err) {
-        return res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de requisição'
+      if(err || !dadosScript) {
+        return res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Script não encontrado'
         });
       }
 
       fs.writeFile('./files/' + dadosScript.nomeArquivo, dadosScript.conteudo , 'utf-8', function (err) {
 
         if(err) return res.status(500).json({
-          status: 500,
-          ipo: 'internal_server_error',
+          erro: 'internal_server_error',
           mensagem: 'Erro Interno'
         });
 
         res.status(200).json({
-          status: 200,
           mensagem: 'Script atualizado com sucesso',
           dados: dadosScript
         });
@@ -99,8 +92,7 @@ function atualizar (req, res, next) {
   } else {
 
     res.status(400).json({
-      status: 400,
-      tipo: 'bad_request',
+      erro: 'bad_request',
       mensagem: 'Erro de parâmetro(s)'
     });
 
@@ -114,25 +106,22 @@ function remover (req, res, next) {
 
     Script.remover(req.params.id, function(err, dados){
 
-      if(err) {
-        res.status(400).json({
-          status: 400,
-          tipo: 'bad_request',
-          mensagem: 'Erro de requisição'
+      if(err || !dados) {
+        res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Script não encontrado'
         });
       } else {
 
         fs.unlink('./files/' + req.body.dados.nomeArquivo, function (err) {
 
           if(err) return res.status(500).json({
-            status: 500,
-            tipo: 'internal_server_error',
+            erro: 'internal_server_error',
             mensagem: 'Erro Interno'
           });
 
           res.status(200).json({
-            status: 200,
-            mensagem: 'Script removida com sucesso',
+            mensagem: 'Script removido com sucesso',
           });
 
         });
@@ -145,8 +134,8 @@ function remover (req, res, next) {
 
     res.status(400).json({
       status: 400,
-      tipo: 'bad_request',
-      mensagem: 'Erro de parâmetro(s)'
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
     });
 
   }

@@ -1,64 +1,57 @@
 var express     = require('express'),
     router      = express.Router(),
     Usuario     = require('../models/Usuario'),
-    Script    = require('../models/Script'),
+    Script      = require('../models/Script'),
     auth        = require('../strategies/auth'),
-    Bot       = require('../models/Bot');
+    Bot         = require('../models/Bot');
 
 // rotas
 
+// TODO: ARRUMAR NO CREATOR
 router.post('/usuario/cadastrar',     auth.signup);
-router.put('/usuario/editar/:id',     auth.isAuthenticated, atualizarUsuario);
+router.put('/usuario/:id/atualizar',  auth.isAuthenticated, atualizarUsuario);
 router.post('/usuario/login',         auth.signin);
-router.get('/usuario/:id/bots/',       auth.isAuthenticated, pegarBotsUsuarioPeloId);
+router.get('/usuario/:id/bots/',      auth.isAuthenticated, pegarBotsUsuarioPeloId);
 
 // funcoes
 
 function atualizarUsuario (req, res, next) {
 
-  try {
+  if(req.body.dados) {
 
-    if(req.body) {
+    var data = {
+      idUsuario : req.params.id,
+      dados: req.body.dados
+    };
 
-      var data = {
-        idUsuario : req.params.id,
-        dados: req.body
-      };
+    Usuario.atualizar(data.dados, function(err, dados){
 
-      Usuario.atualizar(data.dados, function(err, dados){
-
-        if(err) {
-          res.status(400).json({
-            status: 400,
-            tipo: 'bad_request',
-            mensagem: 'Erro de requisição'
-          });
-        }
-
-        res.status(200).json({
-          status: 200,
-          mensagem: 'Usuario atualizada com sucesso',
-          dados: dados
+      if(err) {
+        res.status(400).json({
+          erro: 'bad_request',
+          mensagem: 'Erro de parâmetro(s)'
         });
+      }
 
+      if(!dados) {
+        return res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Usuário não encontrado'
+        });
+      }
+
+      res.status(200).json({
+        mensagem: 'Usuário atualizado com sucesso',
+        dados: dados
       });
 
-    } else {
+    });
 
-      res.status(400).json({
-        status: 400,
-        tipo: 'bad_request',
-        mensagem: 'Erro de parâmetro(s)'
-      });
+  } else {
 
-    }
-
-  } catch (e) {
-
-    res.status(500).json({
-      status: 500,
-      tipo: 'internal_server_error',
-      mensagem: 'Erro Interno'
+    res.status(400).json({
+      erro: 'bad_request',
+      mensagem: 'Erro de parâmetro(s)'
     });
 
   }
@@ -67,20 +60,29 @@ function atualizarUsuario (req, res, next) {
 
 function pegarBotsUsuarioPeloId (req, res, next) {
 
-  Bot.pegarPeloIdUsuario(req.params.id, function(err, dadosBot){
+  if(req.params.id) {
 
-    if(err) return res.status(500).json({
-      status: 500,
-      tipo: 'internal_server_error',
-      mensagem: 'Erro Interno'
+    Bot.pegarPeloIdUsuario(req.params.id, function(err, dadosBot){
+
+      if(err) return res.status(500).json({
+        erro: 'internal_server_error',
+        mensagem: 'Erro Interno'
+      });
+
+      res.status(200).json({
+        dados: dadosBot
+      });
+
     });
 
-    res.status(200).json({
-      status: 200,
-      dados: dadosBot
+  } else {
+
+    res.status(400).json({
+      erro: 'bad_request',
+      mensagem: 'Erro de parâmetro(s)'
     });
 
-  });
+  }
 
 }
 
