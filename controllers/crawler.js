@@ -4,7 +4,6 @@ var express     = require('express'),
     moment      = require('moment'),
     RiveScript  = require('rivescript'),
     Bot         = require('../models/Bot'),
-    Script      = require('../models/Script'),
     Wiki        = require('../strategies/crawler/wiki');
 
 router.get('/crawler', crawler);

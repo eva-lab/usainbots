@@ -2,15 +2,12 @@ var express     = require('express'),
     router      = express.Router(),
     auth        = require('../strategies/auth'),
     moment      = require('moment'),
-    RiveScript  = require('rivescript'),
     Bot         = require('../models/Bot'),
-    Script      = require('../models/Script');
 
 router.post('/bot/cadastrar',       auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',    auth.isAuthenticated, atualizar);
 router.get('/bot/:id/consulta',     consultar);
 router.delete('/bot/:id/remover',   auth.isAuthenticated, remover);
-router.get('/bot/:id/scripts',      auth.isAuthenticated, pegarScripts);
 
 function cadastrar (req, res, next) {
 
