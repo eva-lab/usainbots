@@ -2,6 +2,7 @@ var express     = require('express'),
     router      = express.Router(),
     auth        = require('../strategies/auth'),
     moment      = require('moment'),
+    pln         = require('../strategies/pln'),
     Bot         = require('../models/Bot'),
 
 router.post('/bot/cadastrar',       auth.isAuthenticated, cadastrar);
