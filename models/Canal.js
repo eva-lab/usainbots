@@ -43,4 +43,36 @@ exports.cadastrarFeeds = function(dados, callback) {
   });
 }
 
-exports.buscarCanal = function(dados, callback) {};
+exports.consultarPeloIdBot = function(dados, callback) {
+
+  Canal.find({ 'idBot': dados.idBot }).select('_id').exec(function(err, canais) {
+
+    if (!canais || err) {
+      callback(true);
+      return
+    }
+
+    var ids = [];
+    for (var i = 0; i < canais.length; i++) {
+      ids.push(canais[i]._id);
+    }
+
+    Feed.find({
+      'idCanal': { $in: ids },
+      $or: [
+        { 'tags.titulo' : { $in: dados.query } },
+        { 'tags.conteudo' : { $in: dados.query } }
+      ]
+    })
+    .select('tags.titulo tags.conteudo conteudo')
+    .exec(function(err, feeds){
+      if (!canais || err) {
+        callback(true);
+        return
+      }
+      callback(false, feeds);
+    });
+
+  });
+
+};

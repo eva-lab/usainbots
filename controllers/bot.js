@@ -14,8 +14,8 @@ router.post('/bot/:id/canal/cadastrar',   cadastrarCanal);
 router.post('/canal/:id/feed/cadastrar',  cadastrarFeed); //TODO: Remover rota e adaptar funcao ao crawler
 
 //TODO: REMOVER
-router.post('/pln',                 pln.processar);
-router.post('/pesar',               pln.pesar);
+// router.post('/pln',                 pln.processar);
+// router.post('/pesar',               pln.pesar);
 
 function cadastrar (req, res, next) {
 
@@ -104,13 +104,27 @@ function consultar (req, res, next) {
 
   if(req.params.id && req.query.q) {
 
-    var query = pln.processar(req.query.q);
+    var query = pln.processarQuery(req.query.q);
 
-    Canal.buscar(query, function(err, dados){
+    var dados = {
+      idBot : req.params.id,
+      query : query
+    };
+
+    Canal.consultarPeloIdBot(dados, function(err, feeds){
 
       if(err) return;
 
-      console.log(dados[0].dados[0].tags);
+      var feed = pln.pesarDados({
+        feeds: feeds,
+        query: query
+      });
+
+      res.status(200).json({
+        resposta: feed.conteudo
+      });
+
+      // console.log(feeds);
 
     });
 
@@ -225,7 +239,7 @@ function cadastrarFeed (req, res, next) {
       });
     }
 
-    feeds = pln.processar(feeds, true);
+    feeds = pln.processarDados(feeds, true);
 
     Canal.cadastrarFeeds(feeds, function(err, feeds){
 

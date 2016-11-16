@@ -2,9 +2,52 @@
 var natural               = require('natural'),
     moment                = require('moment'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
+    TfIdf                 = natural.TfIdf,
     exports               = module.exports;
 
-exports.processar = function(dados) {
+function removerAcentos(frase) {
+
+	var mapaAcentosHex 	= {
+		a : /[\xE0-\xE6]/g,
+		e : /[\xE8-\xEB]/g,
+		i : /[\xEC-\xEF]/g,
+		o : /[\xF2-\xF6]/g,
+		u : /[\xF9-\xFC]/g,
+		c : /\xE7/g,
+		n : /\xF1/g
+	};
+
+	for (var letra in mapaAcentosHex) {
+		var expressaoRegular = mapaAcentosHex[letra];
+		frase = frase.replace(expressaoRegular, letra);
+	}
+
+	return frase;
+
+}
+
+function removerConectivos(frase) {
+
+  var conectores = [
+    'o','a','os','as','um','uma','uns','umas','a','ao','aos','de','do','da','dos','das','dum','duma','duns','dumas','em',
+    'no','na','nos','nas','num','numa','nuns','numas','por','pelo','pela','pelos','pelas','que', 'para', 'aquele', 'aqueles',
+    'estes', 'estas', 'isto'
+  ];
+
+  for (var i = 0; i < conectores.length; i++) {
+    for (var y = 0; y < frase.length; y++) {
+      if(frase[y] == conectores[i]) {
+        frase.splice(y,1);
+      }
+    }
+  }
+
+  return frase;
+
+}
+
+
+exports.processarDados = function(dados) {
 
   var tokenizer     = new natural.WordTokenizer();
   var stemmer       = new PortugueseStemmer();
@@ -24,6 +67,7 @@ exports.processar = function(dados) {
     tags.titulo     = tokenizer.tokenize(tags.titulo);
     tags.conteudo   = tokenizer.tokenize(tags.conteudo);
 
+    // (4) stemmering
     for (var y = 0; y < tags.titulo.length; y++) {
       tags.titulo[y] = stemmer.stemWord(tags.titulo[y]);
     }
@@ -32,7 +76,7 @@ exports.processar = function(dados) {
       tags.conteudo[z] = stemmer.stemWord(tags.conteudo[z]);
     }
 
-    // (4) remover conectivos
+    // (5) remover conectivos
     tags.titulo     = removerConectivos(tags.titulo);
     tags.conteudo   = removerConectivos(tags.conteudo);
 
@@ -45,102 +89,80 @@ exports.processar = function(dados) {
 
   return dados;
 
-  function removerAcentos(frase) {
+}
 
-  	var mapaAcentosHex 	= {
-  		a : /[\xE0-\xE6]/g,
-  		e : /[\xE8-\xEB]/g,
-  		i : /[\xEC-\xEF]/g,
-  		o : /[\xF2-\xF6]/g,
-  		u : /[\xF9-\xFC]/g,
-  		c : /\xE7/g,
-  		n : /\xF1/g
-  	};
+exports.processarQuery = function(query) {
 
-  	for (var letra in mapaAcentosHex) {
-  		var expressaoRegular = mapaAcentosHex[letra];
-  		frase = frase.replace(expressaoRegular, letra);
-  	}
+  var tokenizer     = new natural.WordTokenizer();
+  var stemmer       = new PortugueseStemmer();
 
-  	return frase;
+  // (1) remover acentuacao
+  query       = removerAcentos(query.toLowerCase());
 
+  // (2) remover caracteres especiais de pontuacao e outros
+  query       = query.replace(/[^a-z A-Z 0-9]/g,'');
+
+  // (3) tokenizer
+  query       = tokenizer.tokenize(query);
+
+  // (4) stemmering
+  for (var i = 0; i < query.length; i++) {
+    query[i] = stemmer.stemWord(query[i]);
   }
 
-  function removerConectivos(frase) {
+  // (5) remover conectivos
+  query      = removerConectivos(query);
 
-    var conectores = [
-      'o','a','os','as','um','uma','uns','umas','a','ao','aos','de','do','da','dos','das','dum','duma','duns','dumas','em',
-      'no','na','nos','nas','num','numa','nuns','numas','por','pelo','pela','pelos','pelas','que', 'para', 'aquele', 'aqueles',
-      'estes', 'estas', 'isto'
-    ];
-
-    for (var i = 0; i < conectores.length; i++) {
-      for (var y = 0; y < frase.length; y++) {
-        if(frase[y] == conectores[i]) {
-          frase.splice(y,1);
-        }
-      }
-    }
-
-    return frase;
-
-  }
+  return query;
 
 }
 
-exports.pesar = function(req, res, next) {
+exports.pesarDados = function(dados) {
 
-  // console.log(natural.JaroWinklerDistance("ones","onez"))
-  // console.log(natural.JaroWinklerDistance('one', 'one'));
-  // console.log(natural.LevenshteinDistance("ones","onez"));
-  // console.log(natural.LevenshteinDistance('one', 'one'));
-  // return;
+  var feeds         = dados.feeds;
+  var query         = dados.query;
+  var peso          = 0;
+  var pesos         = [];
+  var frase         = "";
+  var tfidf         = null;
 
-  var stemmer = new PortugueseStemmer();
+  for (var i = 0; i < feeds.length; i++) {
 
-  if(req.body.query) {
+    tfidf = new TfIdf();
 
-    var frase = req.body.query;
-    var textinho = [
-    "centro",
-    "informatica",
-    "universidade",
-    "federal",
-    "pernambuco",
-    "centro",
-    "responsavel",
-    "cursos",
-    "graduacao",
-    "ciencia",
-    "computacao",
-    "sistemas",
-    "informacao",
-    "e",
-    "engenharia",
-    "computacao",
-    "alem",
-    "cursos",
-    "posgraduacao",
-    "ciencia",
-    "computacao"
-  ];
+    frase = feeds[i].tags.titulo.toString();
+    frase = frase.replace(/,/gi, " ");
+    frase = frase.trim();
+    tfidf.addDocument(frase);
 
-  var peso = 0, distancia = 0;
+    frase = feeds[i].tags.conteudo.toString();
+    frase = frase.replace(/,/gi, " ");
+    frase = frase.trim();
+    tfidf.addDocument(frase);
 
-    // (4) stemmer
-    for (var i = 0; i < textinho.length; i++) {
-      for (var y = 0; y < frase.length; y++) {
-        distancia = natural.DiceCoefficient(textinho[i], frase[y]);
-        console.log(textinho[i], frase[y], distancia);
-        if(distancia > 0.4){
-          console.log(textinho[i], frase[y], distancia);
-          peso = peso + distancia;
-        }
+    for (var y = 0; y < query.length; y++) {
+      tfidf.tfidfs(query[y], function(z, measure) {
+        peso = peso + measure;
+
+      });
+      if(query.length-1 == y){
+        pesos.push(peso);
+        peso = 0;
       }
     }
 
   }
 
-  res.status(202).json({ mensagem: peso });
+  var maiorPeso = Math.max.apply(null, pesos);
+  var indice    = 0;
+
+  for (var i = 0; i < pesos.length; i++) {
+    if(pesos[i] == maiorPeso){
+      indice = i;
+      break;
+    }
+  }
+
+  return feeds[indice];
 
 }
