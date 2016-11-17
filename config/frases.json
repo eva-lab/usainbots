@@ -1,0 +1,27 @@
+{
+  "abertura": [
+    "Olá! no que posso ajudar?",
+    "Oi! Seja bem vindo, no que posso ajudar?",
+    "Oi, posso ajudá-lo?"
+  ],
+  "introducaoRespostas": [
+    "Acho que isso pode ajudar você...",
+    "Parece que isso pode ajudar você",
+    "É isso que eu sei:",
+    "Olha aí!",
+    "Eu sei!",
+    "Talvez isso possa te ajudar:"
+  ],
+  "fechamento": [
+    "Foi bom conversar com você! :D",
+    "Espero te ver em breve! Até mais.",
+    "Bacana! Até mais então",
+    "Até mais! tenha um ótimo dia ;)"
+  ],
+  "semResposta": [
+    "Humm... eu não sei nada sobre isso... Você tem algum outro questionamento?",
+    "Xii! To por fora desse assunto... O que mais você desejaria saber?",
+    "É amigo, realmente não sei nada sobre isso... Posso tentar te ajudar em mais alguma coisa?",
+    "Foi mal, mas acho que não sei te responder... Você tem mais alguma questionamento?"
+  ]
+}

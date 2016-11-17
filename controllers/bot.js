@@ -3,19 +3,16 @@ var express     = require('express'),
     auth        = require('../strategies/auth'),
     moment      = require('moment'),
     pln         = require('../strategies/pln'),
+    rn          = require('random-number'),
     Bot         = require('../models/Bot'),
     Canal       = require('../models/Canal');
 
 router.post('/bot/cadastrar',             auth.isAuthenticated, cadastrar);
-router.put('/bot/:id/atualizar',          auth.isAuthenticated, atualizar);
+router.put('/bot/:id/atualizar',          atualizar);
 router.get('/bot/:id/consulta',           consultar);
 router.delete('/bot/:id/remover',         auth.isAuthenticated, remover);
 router.post('/bot/:id/canal/cadastrar',   cadastrarCanal);
 router.post('/canal/:id/feed/cadastrar',  cadastrarFeed); //TODO: Remover rota e adaptar funcao ao crawler
-
-//TODO: REMOVER
-// router.post('/pln',                 pln.processar);
-// router.post('/pesar',               pln.pesar);
 
 function cadastrar (req, res, next) {
 
@@ -111,20 +108,49 @@ function consultar (req, res, next) {
       query : query
     };
 
-    Canal.consultarPeloIdBot(dados, function(err, feeds){
+    Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
 
-      if(err) return;
+      if(err) {
+        res.status(404).json({
+          erro: 'not_found',
+          mensagem: 'Bot não encontrado'
+        });
+      }
 
-      var feed = pln.pesarDados({
-        feeds: feeds,
-        query: query
+      console.log(bot);
+
+      Canal.consultarPeloIdBot(dados, function(err, feeds){
+
+        console.log(feeds);
+
+        if(err) {
+          return res.status(500).json({
+            erro: 'internal_server_error',
+            mensagem: 'Erro Interno'
+          });
+        } else if(!feeds || feeds == "") {
+          return res.status(500).json({
+            erro: 'sem_conhecimento',
+            mensagem: 'O Bot não possui uma base de conhecimento'
+          });
+        }
+
+        var feed = pln.pesarDados({
+          feeds: feeds,
+          query: query
+        });
+        
+        var quantidadeRespostas = bot.frases.introducaoRespostas.length -1;
+
+        var indice = rn({ min: 0, max: quantidadeRespostas, integer: true });
+
+        feed.conteudo = bot.frases.introducaoRespostas[indice] + "\n" + feed.conteudo;
+
+        res.status(200).json({
+          resposta: feed.conteudo
+        });
+
       });
-
-      res.status(200).json({
-        resposta: feed.conteudo
-      });
-
-      // console.log(feeds);
 
     });
 
