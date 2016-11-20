@@ -12,16 +12,26 @@
     "Eu sei!",
     "Talvez isso possa te ajudar:"
   ],
-  "fechamento": [
+  "agradecimento": [
+    "Por nada!",
+    "Nada!",
+    "Foi um prazer!"
+  ],
+  "engajamento": [
+    "Posso te ajduar em mais alguma coisa?",
+    "Você está precisando de mais alguma coisa?",
+    "Você precisa de mais alguma coisa?"
+  ],
+  "encerramento": [
     "Foi bom conversar com você! :D",
     "Espero te ver em breve! Até mais.",
     "Bacana! Até mais então",
     "Até mais! tenha um ótimo dia ;)"
   ],
   "semResposta": [
-    "Humm... eu não sei nada sobre isso... Você tem algum outro questionamento?",
-    "Xii! To por fora desse assunto... O que mais você desejaria saber?",
-    "É amigo, realmente não sei nada sobre isso... Posso tentar te ajudar em mais alguma coisa?",
-    "Foi mal, mas acho que não sei te responder... Você tem mais alguma questionamento?"
+    "Humm... eu não sei nada sobre isso...",
+    "Xii! To por fora desse assunto...",
+    "É amigo, realmente não sei nada sobre isso...",
+    "Foi mal, mas acho que não sei te responder..."
   ]
 }

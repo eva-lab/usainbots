@@ -5,9 +5,10 @@ var express     = require('express'),
     pln         = require('../strategies/pln'),
     rn          = require('random-number'),
     Bot         = require('../models/Bot'),
-    Canal       = require('../models/Canal');
+    Canal       = require('../models/Canal'),
+    frases      = require('../config/frases');
 
-router.post('/bot/cadastrar',             auth.isAuthenticated, cadastrar);
+router.post('/bot/cadastrar',             cadastrar);
 router.put('/bot/:id/atualizar',          atualizar);
 router.get('/bot/:id/consulta',           consultar);
 router.delete('/bot/:id/remover',         auth.isAuthenticated, remover);
@@ -28,6 +29,7 @@ function cadastrar (req, res, next) {
           erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
+
       } else {
         res.status(200).json({
           dados: dados,
@@ -101,12 +103,8 @@ function consultar (req, res, next) {
 
   if(req.params.id && req.query.q) {
 
-    var query = pln.processarQuery(req.query.q);
-
-    var dados = {
-      idBot : req.params.id,
-      query : query
-    };
+    var frase = req.query.q;
+    var dados = { idBot : req.params.id, query : null };
 
     Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
 
@@ -117,40 +115,103 @@ function consultar (req, res, next) {
         });
       }
 
-      console.log(bot);
+      // (1) tratamento
+      dados.query = pln.processarQuery(frase, {
+        acentos :   true,
+        stemmering: true,
+        conectivos: true
+      });
 
-      Canal.consultarPeloIdBot(dados, function(err, feeds){
+      // (2) classificar
+      var classifier = pln.classificar(dados.query);
 
-        console.log(feeds);
+      if(classifier.pergunta){
 
-        if(err) {
-          return res.status(500).json({
-            erro: 'internal_server_error',
-            mensagem: 'Erro Interno'
+        dados.query = pln.processarQuery(frase, { all: true });
+
+        Canal.consultarPeloIdBot(dados, function(err, feeds){
+
+          if(err) {
+            return res.status(500).json({
+              erro: 'internal_server_error',
+              mensagem: 'Erro Interno'
+            });
+          } else if(!feeds || feeds == "") {
+
+            if(bot.frases.semResposta.length < 1){
+              bot.frases.semResposta = frases.semResposta;
+            }
+
+            if(bot.frases.agradecimento.length < 1){
+              bot.frases.agradecimento = frases.agradecimento;
+            }
+
+            var quantidade    = bot.frases.semResposta.length -1;
+            var indice        = rn({ min: 0, max: quantidade, integer: true });
+            var resposta      = bot.frases.semResposta[indice];
+
+            quantidade    = bot.frases.engajamento.length -1;
+            indice        = rn({ min: 0, max: quantidade, integer: true });
+            resposta      = resposta + "\n" + bot.frases.engajamento[indice];
+
+            return res.status(200).json({
+              resposta: resposta
+            });
+          }
+
+          var feed = pln.pesarDados({ feeds: feeds, query: frase });
+
+          var quantidadeRespostas = bot.frases.introducaoRespostas.length -1;
+          var indice = rn({ min: 0, max: quantidadeRespostas, integer: true });
+          feed.conteudo = bot.frases.introducaoRespostas[indice] + "\n" + feed.conteudo;
+
+          return res.status(200).json({
+            resposta: feed.conteudo
           });
-        } else if(!feeds || feeds == "") {
-          return res.status(500).json({
-            erro: 'sem_conhecimento',
-            mensagem: 'O Bot não possui uma base de conhecimento'
-          });
+
+        });
+
+      } else if(classifier.agradecimento){
+
+        if(bot.frases.agradecimento.length < 1){
+          bot.frases.agradecimento = frases.agradecimento;
         }
 
-        var feed = pln.pesarDados({
-          feeds: feeds,
-          query: query
+        var quantidade  = bot.frases.agradecimento.length -1;
+        var indice      = rn({ min: 0, max: quantidade, integer: true });
+        var resposta    = bot.frases.agradecimento[indice];
+
+        if(!classifier.encerramento){
+
+          if(bot.frases.engajamento.length < 1){
+            bot.frases.engajamento = frases.engajamento;
+          }
+
+          quantidade    = bot.frases.engajamento.length -1;
+          indice        = rn({ min: 0, max: quantidade, integer: true });
+          resposta      = resposta + "\n" + bot.frases.engajamento[indice];
+
+        }
+
+        return res.status(200).json({
+          resposta: resposta
         });
-        
-        var quantidadeRespostas = bot.frases.introducaoRespostas.length -1;
 
-        var indice = rn({ min: 0, max: quantidadeRespostas, integer: true });
+      } else if(classifier.encerramento){
 
-        feed.conteudo = bot.frases.introducaoRespostas[indice] + "\n" + feed.conteudo;
+        if(bot.frases.encerramento.length < 1){
+          bot.frases.encerramento = frases.encerramento;
+        }
 
-        res.status(200).json({
-          resposta: feed.conteudo
+        var quantidade  = bot.frases.encerramento.length -1;
+        var indice      = rn({ min: 0, max: quantidade, integer: true });
+        var resposta    = bot.frases.encerramento[indice];
+
+        return res.status(200).json({
+          resposta: resposta
         });
 
-      });
+      }
 
     });
 

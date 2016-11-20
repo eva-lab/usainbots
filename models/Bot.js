@@ -7,10 +7,12 @@ var botSchema = new mongoose.Schema({
   nome:               { type: String, require: true },
   dataCriacao:        { type: Date },
   frases: {
-    abertura:             [ String ],
-    introducaoRespostas:  [ String ],
-    fechamento:           [ String ],
-    semResposta:          [ String ],
+    abertura:               [ String ],
+    introducaoRespostas:    [ String ],
+    agradecimento:          [ String ],
+    encerramento:           [ String ],
+    semResposta:            [ String ],
+    engajamento:            [ String ]
   }
 });
 
@@ -66,12 +68,20 @@ exports.atualizar = function(dadosReq, callback) {
         dados.frases.introducaoRespostas = dadosReq.dados.frases.introducaoRespostas;
       }
 
-      if(dadosReq.dados.frases.fechamento){
-        dados.frases.fechamento = dadosReq.dados.frases.fechamento;
+      if(dadosReq.dados.frases.encerramento){
+        dados.frases.encerramento = dadosReq.dados.frases.encerramento;
       }
 
       if(dadosReq.dados.frases.semResposta){
         dados.frases.semResposta = dadosReq.dados.frases.semResposta;
+      }
+
+      if(dadosReq.dados.frases.agradecimento){
+        dados.frases.agradecimento = dadosReq.dados.frases.agradecimento;
+      }
+
+      if(dadosReq.dados.frases.engajamento){
+        dados.frases.engajamento = dadosReq.dados.frases.engajamento;
       }
 
       dados.save(function(err){
@@ -133,7 +143,7 @@ exports.pegarPeloIdUsuario = function(id, callback) {
 
 };
 
-
+// Pegar pelo ID de um Bot
 exports.pegarPeloIdBot = function(id, callback) {
 
   Bot.findById(id, function(err, bot){

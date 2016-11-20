@@ -2,8 +2,11 @@
 var natural               = require('natural'),
     moment                = require('moment'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
+    tags                  = require('../config/classifier'),
     TfIdf                 = natural.TfIdf,
     exports               = module.exports;
+
+/* Funcoes Globais */
 
 function removerAcentos(frase) {
 
@@ -46,8 +49,45 @@ function removerConectivos(frase) {
 
 }
 
+/* Exports */
 
-exports.processarDados = function(dados) {
+exports.classificar     = function (query) {
+
+  var classifier = {
+    pergunta : false,
+    agradecimento: false,
+    encerramento: false
+  }
+
+  var regexp = new RegExp("\\?");
+
+  if(regexp.test(query)){
+    classifier.pergunta = true;
+  }
+
+  tags.encerramento   = tags.encerramento.toString();
+  tags.encerramento   =  tags.encerramento.replace(/,/gi, "|");
+
+  regexp = new RegExp(tags.encerramento);
+
+  if(regexp.test(query)){
+    classifier.encerramento = true;
+  }
+
+  tags.agradecimento  = tags.agradecimento.toString();
+  tags.agradecimento  =  tags.agradecimento.replace(/,/gi, "|");
+
+  regexp = new RegExp(tags.agradecimento);
+
+  if(regexp.test(query)){
+    classifier.agradecimento = true;
+  }
+
+  return classifier;
+
+}
+
+exports.processarDados  = function(dados) {
 
   var tokenizer     = new natural.WordTokenizer();
   var stemmer       = new PortugueseStemmer();
@@ -91,33 +131,93 @@ exports.processarDados = function(dados) {
 
 }
 
-exports.processarQuery = function(query) {
+exports.processarQuery  = function(query, opcoes) {
+
+  if(!opcoes) opcoes = {};
 
   var tokenizer     = new natural.WordTokenizer();
   var stemmer       = new PortugueseStemmer();
 
+  if(opcoes.all) {
+
+    opcoes.acentos     = true;
+    opcoes.caracteres  = true;
+    opcoes.tokenizer   = true;
+    opcoes.stemmering  = true;
+    opcoes.conectivos  = true;
+
+  } else {
+
+    opcoes.acentos     = opcoes.acentos     || false;
+    opcoes.caracteres  = opcoes.caracteres  || false;
+    opcoes.tokenizer   = opcoes.tokenizer   || false;
+    opcoes.stemmering  = opcoes.stemmering  || false;
+    opcoes.conectivos  = opcoes.conectivos  || false;
+
+  }
+
+  // (0) lowercase
+  query = query.toLowerCase();
+
   // (1) remover acentuacao
-  query       = removerAcentos(query.toLowerCase());
+  if(opcoes.acentos){
+    query       = removerAcentos(query);
+  }
 
   // (2) remover caracteres especiais de pontuacao e outros
-  query       = query.replace(/[^a-z A-Z 0-9]/g,'');
+  if(opcoes.caracteres){
+    query       = query.replace(/[^a-z A-Z 0-9]/g,'');
+  }
 
   // (3) tokenizer
-  query       = tokenizer.tokenize(query);
+  if(opcoes.tokenizer){
+    query       = tokenizer.tokenize(query);
+  }
 
-  // (4) stemmering
-  for (var i = 0; i < query.length; i++) {
-    query[i] = stemmer.stemWord(query[i]);
+  if(opcoes.stemmering) {
+    if(!opcoes.tokenizer){
+
+      tokenizer = new natural.WordPunctTokenizer();
+
+      // (3) tokenizer
+      query       = tokenizer.tokenize(query);
+
+      // (4) stemmering
+      for (var i = 0; i < query.length; i++) {
+        query[i] = stemmer.stemWord(query[i]);
+      }
+
+      //(5) untokenizer
+      query = query.toString();
+      query = query.replace(/,/gi, " ");
+
+    } else {
+      // (4) stemmering
+      for (var i = 0; i < query.length; i++) {
+        query[i] = stemmer.stemWord(query[i]);
+      }
+    }
   }
 
   // (5) remover conectivos
-  query      = removerConectivos(query);
+  if(opcoes.conectivos){
+
+    if(!opcoes.tokenizer) query = query.split(" ");
+
+    query = removerConectivos(query);
+
+    if(!opcoes.tokenizer){
+      query = query.toString();
+      query = query.replace(/,/gi, " ");
+    }
+
+  }
 
   return query;
 
 }
 
-exports.pesarDados = function(dados) {
+exports.pesarDados      = function(dados) {
 
   var feeds         = dados.feeds;
   var query         = dados.query;

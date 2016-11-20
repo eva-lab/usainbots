@@ -49,7 +49,7 @@ exports.consultarPeloIdBot = function(dados, callback) {
 
     if (!canais || err) {
       callback(true);
-      return
+      return;
     }
 
     var ids = [];
@@ -66,9 +66,10 @@ exports.consultarPeloIdBot = function(dados, callback) {
     })
     .select('tags.titulo tags.conteudo conteudo')
     .exec(function(err, feeds){
-      if (!canais || err) {
+      console.log(feeds);
+      if (!feeds || err) {
         callback(true);
-        return
+        return;
       }
       callback(false, feeds);
     });
