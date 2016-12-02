@@ -10,7 +10,7 @@ var canalSchema = new mongoose.Schema({
   ultimaColeta: { type: Date, require: true }
 });
 
-var feedSchema = new mongoose.Schema({
+var documentSchema = new mongoose.Schema({
     idCanal:      { type: String },
     titulo:       { type: String },
     conteudo:     { type: String },
@@ -21,7 +21,7 @@ var feedSchema = new mongoose.Schema({
 });
 
 var Canal =  mongoose.model('Canal', canalSchema);
-var Feed =  mongoose.model('Feed', feedSchema);
+var Document =  mongoose.model('Document', documentSchema);
 
 exports.cadastrarCanal = function(dados, callback) {
   Canal.insertMany(dados, function(err, canal){
@@ -33,19 +33,19 @@ exports.cadastrarCanal = function(dados, callback) {
   });
 };
 
-exports.cadastrarFeeds = function(dados, callback) {
-  Feed.insertMany(dados, function(err, feeds){
+exports.cadastrarDocuments = function(dados, callback) {
+  Document.insertMany(dados, function(err, documents){
     if(err){
       callback(true);
       return;
     }
-    callback(false, feeds);
+    callback(false, documents);
   });
 }
 
 exports.consultarPeloIdBot = function(dados, callback) {
 
-  Canal.find({ 'idBot': dados.idBot }).select('_id').exec(function(err, canais) {
+  Canal.find({ 'idBot': dados.idBot }).exec(function(err, canais) {
 
     if (!canais || err) {
       callback(true);
@@ -57,22 +57,25 @@ exports.consultarPeloIdBot = function(dados, callback) {
       ids.push(canais[i]._id);
     }
 
-    Feed.find({
-      'idCanal': { $in: ids },
-      $or: [
-        { 'tags.titulo' : { $in: dados.query } },
-        { 'tags.conteudo' : { $in: dados.query } }
-      ]
-    })
-    .select('tags.titulo tags.conteudo conteudo')
-    .exec(function(err, feeds){
-      console.log(feeds);
-      if (!feeds || err) {
-        callback(true);
-        return;
-      }
-      callback(false, feeds);
-    });
+    Document.find({
+     $and: [
+       {'idCanal': { $in: ids }},
+       {
+         $or: [
+           {'tags.titulo': { $in: dados.query }},
+           {'tags.conteudo': { $in: dados.query }}
+         ]
+       }
+     ]
+   }, function (err, documents) {
+
+     if (!documents || err) {
+         callback(true);
+         return;
+       }
+       callback(false, documents);
+   });
+
 
   });
 
