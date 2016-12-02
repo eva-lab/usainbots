@@ -2,7 +2,7 @@ var express     = require('express'),
     router      = express.Router(),
     auth        = require('../strategies/auth'),
     moment      = require('moment'),
-    pln         = require('../strategies/pln'),
+    pln         = require('../pln'),
     rn          = require('random-number'),
     Bot         = require('../models/Bot'),
     Canal       = require('../models/Canal'),
@@ -13,7 +13,7 @@ router.put('/bot/:id/atualizar',          atualizar);
 router.get('/bot/:id/consulta',           consultar);
 router.delete('/bot/:id/remover',         auth.isAuthenticated, remover);
 router.post('/bot/:id/canal/cadastrar',   cadastrarCanal);
-router.post('/canal/:id/feed/cadastrar',  cadastrarFeed); //TODO: Remover rota e adaptar funcao ao crawler
+router.post('/canal/:id/document/cadastrar',  cadastrarDocument); //TODO: Remover rota e adaptar funcao ao crawler
 
 function cadastrar (req, res, next) {
 
@@ -101,115 +101,94 @@ function atualizar (req, res, next) {
 
 function consultar (req, res, next) {
 
-  if(req.params.id && req.query.q) {
+  if (req.params.id && req.query.q) {
 
-    var frase = req.query.q;
+    var sentenceOriginal = req.query.q;
     var dados = { idBot : req.params.id, query : null };
 
     Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
 
-      if(err) {
-        res.status(404).json({
+      if (err) {
+        return res.status(404).json({
           erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       }
 
+      var botSentences    = bot.frases;
+      var random          = null;
+      var resposta        = null;
+
       // (1) tratamento
-      dados.query = pln.processarQuery(frase, {
-        acentos :   true,
-        stemmering: true,
-        conectivos: true
-      });
+      dados.query = pln.processQuery(sentenceOriginal, { stemmering: true, lowercase: true });
 
       // (2) classificar
-      var classifier = pln.classificar(dados.query);
+      var classify = pln.classifier(dados.query);
 
-      if(classifier.pergunta){
 
-        dados.query = pln.processarQuery(frase, { all: true });
+      // (3) sem respostas
+      if (botSentences.semResposta.length < 1) {
+        botSentences.semResposta = frases.semResposta;
+      }
 
-        Canal.consultarPeloIdBot(dados, function(err, feeds){
+      if (botSentences.agradecimento.length < 1) {
+        botSentences.agradecimento = frases.agradecimento;
+      }
 
-          if(err) {
+      if (botSentences.encerramento.length < 1) {
+        botSentences.encerramento = frases.encerramento;
+      }
+
+      if (classify == 'questionamento'){
+
+        dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
+
+        Canal.consultarPeloIdBot(dados, function(err, documents){
+
+          if (err) {
             return res.status(500).json({
               erro: 'internal_server_error',
               mensagem: 'Erro Interno'
             });
-          } else if(!feeds || feeds == "") {
+          } else if(!documents || documents == "") {
 
-            if(bot.frases.semResposta.length < 1){
-              bot.frases.semResposta = frases.semResposta;
-            }
+            // sem resposta
+            quantidade    = botSentences.semResposta.length -1;
+            random        = rn({ min: 0, max: quantidade, integer: true });
+            resposta      = botSentences.semResposta[random];
 
-            if(bot.frases.agradecimento.length < 1){
-              bot.frases.agradecimento = frases.agradecimento;
-            }
+            // sem resposta  -> engajamento
+            quantidade    = botSentences.engajamento.length -1;
+            random        = rn({ min: 0, max: quantidade, integer: true });
+            resposta      = resposta + "\n" + botSentences.engajamento[random];
 
-            var quantidade    = bot.frases.semResposta.length -1;
-            var indice        = rn({ min: 0, max: quantidade, integer: true });
-            var resposta      = bot.frases.semResposta[indice];
+            return res.status(200).json({ resposta: resposta });
 
-            quantidade    = bot.frases.engajamento.length -1;
-            indice        = rn({ min: 0, max: quantidade, integer: true });
-            resposta      = resposta + "\n" + bot.frases.engajamento[indice];
-
-            return res.status(200).json({
-              resposta: resposta
-            });
           }
 
-          var feed = pln.pesarDados({ feeds: feeds, query: frase });
+          // com resposta
+          var document = pln.weightReply({ documents: documents, query: dados.query });
 
-          var quantidadeRespostas = bot.frases.introducaoRespostas.length -1;
-          var indice = rn({ min: 0, max: quantidadeRespostas, integer: true });
-          feed.conteudo = bot.frases.introducaoRespostas[indice] + "\n" + feed.conteudo;
+          random = rn({ min: 0, max: botSentences.introducaoRespostas.length -1, integer: true });
+          document.conteudo = botSentences.introducaoRespostas[random] + "\n" + document.conteudo;
 
-          return res.status(200).json({
-            resposta: feed.conteudo
-          });
+          return res.status(200).json({ resposta: document.conteudo });
 
         });
 
-      } else if(classifier.agradecimento){
+      } else if (classify == 'agradecimento'){
 
-        if(bot.frases.agradecimento.length < 1){
-          bot.frases.agradecimento = frases.agradecimento;
-        }
+        random      = rn({ min: 0, max: botSentences.agradecimento.length -1, integer: true });
+        resposta    = botSentences.agradecimento[random];
 
-        var quantidade  = bot.frases.agradecimento.length -1;
-        var indice      = rn({ min: 0, max: quantidade, integer: true });
-        var resposta    = bot.frases.agradecimento[indice];
+        return res.status(200).json({ resposta: resposta });
 
-        if(!classifier.encerramento){
+      } else if (classify == 'encerramento'){
 
-          if(bot.frases.engajamento.length < 1){
-            bot.frases.engajamento = frases.engajamento;
-          }
+        random      = rn({ min: 0, max: botSentences.encerramento.length -1, integer: true });
+        resposta    = botSentences.encerramento[random];
 
-          quantidade    = bot.frases.engajamento.length -1;
-          indice        = rn({ min: 0, max: quantidade, integer: true });
-          resposta      = resposta + "\n" + bot.frases.engajamento[indice];
-
-        }
-
-        return res.status(200).json({
-          resposta: resposta
-        });
-
-      } else if(classifier.encerramento){
-
-        if(bot.frases.encerramento.length < 1){
-          bot.frases.encerramento = frases.encerramento;
-        }
-
-        var quantidade  = bot.frases.encerramento.length -1;
-        var indice      = rn({ min: 0, max: quantidade, integer: true });
-        var resposta    = bot.frases.encerramento[indice];
-
-        return res.status(200).json({
-          resposta: resposta
-        });
+        return res.status(200).json({ resposta: resposta });
 
       }
 
@@ -310,25 +289,25 @@ function cadastrarCanal (req, res, next) {
 
 }
 
-function cadastrarFeed (req, res, next) {
+function cadastrarDocument (req, res, next) {
 
   if(req.params.id && req.body.dados) {
 
     var dados   = req.body.dados || [];
-    var feeds   = [];
+    var documents   = [];
     var idCanal = req.params.id;
 
     for (var i = 0; i < dados.length; i++) {
-      feeds.push({
+      documents.push({
         idCanal:  idCanal,
         titulo:   dados[i].titulo,
         conteudo: dados[i].conteudo
       });
     }
 
-    feeds = pln.processarDados(feeds, true);
+    documents = pln.processData(documents, true);
 
-    Canal.cadastrarFeeds(feeds, function(err, feeds){
+    Canal.cadastrarDocuments(documents, function(err, documents){
 
       if(err) {
         return res.status(500).json({
@@ -338,8 +317,8 @@ function cadastrarFeed (req, res, next) {
       }
 
       res.status(200).json({
-        dados: feeds,
-        mensagem: 'Feed(s) inserido(s) com sucesso!'
+        dados: documents,
+        mensagem: 'Document(s) inserido(s) com sucesso!'
       });
 
     });
