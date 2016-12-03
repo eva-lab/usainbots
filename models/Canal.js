@@ -59,11 +59,23 @@ exports.consultarPeloIdBot = function(dados, callback) {
 
     Document.find({
      $and: [
-       {'idCanal': { $in: ids }},
+       {
+         'idCanal': { $in: ids }
+       },
        {
          $or: [
-           {'tags.titulo': { $in: dados.query }},
-           {'tags.conteudo': { $in: dados.query }}
+          {
+            'tags.titulo': { $in: dados.query }
+          },
+          {
+            'tags.conteudo':{
+              $elemMatch:{
+                $elemMatch:{
+                  $in: dados.query
+                }
+              }
+            }
+          }
          ]
        }
      ]

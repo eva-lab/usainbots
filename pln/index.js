@@ -155,6 +155,7 @@ exports.weightReply   = function(data) {
   var documents         = data.documents;
   var query             = data.query;
   var weight            = 0;
+  var weightTitle       = 0;
   var weights           = [];
   var setence           = "";
   var tfidf             = null;
@@ -164,34 +165,52 @@ exports.weightReply   = function(data) {
 
     tfidf = new TfIdf();
 
+    // console.log(documents[i].tags.titulo);
     tfidf.addDocument(documents[i].tags.titulo);
-    tfidf.addDocument(documents[i].tags.conteudo);
+
+    for (var y = 0; y < documents[i].tags.conteudo.length; y++) {
+      // console.log(documents[i].tags.conteudo[y]);
+      tfidf.addDocument(documents[i].tags.conteudo[y]);
+    }
 
     tfidf.tfidfs(query, function(z, measure) {
 
-      if (z == 0) {
-        weight = (weight + (measure * 2)) / (documents[i].tags.titulo.length);
-      } else {
-        weight = (weight + measure) / (documents[i].tags.conteudo.length);
-        weights.push(weight);
+      if (z == 0) { // title
+
+        weightTitle = (measure * 2) / (documents[i].tags.titulo.length);
+
+      } else { // content
+
+        if(measure > 0) {
+          weight = ( weightTitle + (measure / documents[i].tags.conteudo[z-1].length) );
+        } else {
+          weight = weightTitle / documents[i].tags.conteudo[z-1].length;
+        }
+
+        weights.push({
+          indexDocument:  i,
+          indexContent: z-1,
+          weight: weight
+        });
+
         weight = 0;
+
       }
 
     });
 
   }
 
-  var maxWeight = Math.max.apply(null, weights);
-  var index    = 0;
+
+  var document = weights[0];
 
   for (var i = 0; i < weights.length; i++) {
-    if(weights[i] == maxWeight){
-      index = i;
-      break;
+    if(weights[i].weight > document.weight){
+      max = weights[i];
     }
   }
 
-  return documents[index];
+  return documents[document.indexDocument].conteudo[document.indexContent];
 
 }
 

@@ -126,7 +126,6 @@ function consultar (req, res, next) {
       // (2) classificar
       var classify = pln.classifier(dados.query);
 
-
       // (3) sem respostas
       if (botSentences.semResposta.length < 1) {
         botSentences.semResposta = frases.semResposta;
@@ -145,6 +144,8 @@ function consultar (req, res, next) {
         dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
 
         Canal.consultarPeloIdBot(dados, function(err, documents){
+
+          console.log(botSentences);
 
           if (err) {
             return res.status(500).json({
@@ -168,12 +169,12 @@ function consultar (req, res, next) {
           }
 
           // com resposta
-          var document = pln.weightReply({ documents: documents, query: dados.query });
+          var documentContent = pln.weightReply({ documents: documents, query: dados.query });
 
           random = rn({ min: 0, max: botSentences.introducaoRespostas.length -1, integer: true });
-          document.conteudo = botSentences.introducaoRespostas[random] + "\n" + document.conteudo;
+          documentContent = botSentences.introducaoRespostas[random] + "\n" + documentContent;
 
-          return res.status(200).json({ resposta: document.conteudo });
+          return res.status(200).json({ resposta: documentContent });
 
         });
 
