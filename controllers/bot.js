@@ -6,13 +6,14 @@ var express     = require('express'),
     rn          = require('random-number'),
     Bot         = require('../models/Bot'),
     Canal       = require('../models/Canal'),
-    frases      = require('../config/frases');
+    frases      = require('../config/frases'),
+    config      = require('../config/config');
 
-router.post('/bot/cadastrar',             cadastrar);
-router.put('/bot/:id/atualizar',          atualizar);
-router.get('/bot/:id/consulta',           consultar);
-router.delete('/bot/:id/remover',         auth.isAuthenticated, remover);
-router.post('/bot/:id/canal/cadastrar',   cadastrarCanal);
+router.post('/bot/cadastrar',                 cadastrar);
+router.put('/bot/:id/atualizar',              atualizar);
+router.get('/bot/:id/consulta',               consultar);
+router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
+router.post('/bot/:id/canal/cadastrar',       cadastrarCanal);
 router.post('/canal/:id/document/cadastrar',  cadastrarDocument); //TODO: Remover rota e adaptar funcao ao crawler
 
 function cadastrar (req, res, next) {
@@ -241,17 +242,39 @@ function cadastrarCanal (req, res, next) {
     var idBot   = req.params.id;
     var data    = moment().format();
     var canais  = [];
+    var valido  = true;
 
     if(dados && dados.length > 0) {
 
       for (var i = 0; i < dados.length; i++) {
+
+        if(dados[i].uri && dados[i].tipo) {
+          dados[i].tipo = dados[i].tipo.toLowerCase();
+
+          if(config.channels.tipos.indexOf(dados[i].tipo) < 0){
+            valido = false;
+            break;
+          }
+        } else {
+          valido = false;
+          break;
+        }
+
         canais.push({
           idBot:        idBot,
           nome:         dados[i].nome,
           tipo:         dados[i].tipo,
-          endereco:     dados[i].endereco,
+          uri:          dados[i].uri,
           dataCriacao:  data,
           ultimaColeta: data
+        });
+
+      }
+
+      if(!valido) {
+        return res.status(400).json({
+          erro: 'bad_request',
+          mensagem: 'Erro de parâmetro(s)'
         });
       }
 
@@ -293,16 +316,18 @@ function cadastrarDocument (req, res, next) {
 
   if(req.params.id && req.body.dados) {
 
-    var dados   = req.body.dados || [];
+    var dados       = req.body.dados || [];
+    var idCanal     = req.params.id;
     var documents   = [];
-    var idCanal = req.params.id;
 
     for (var i = 0; i < dados.length; i++) {
-      documents.push({
-        idCanal:  idCanal,
-        titulo:   dados[i].titulo,
-        conteudo: dados[i].conteudo
-      });
+
+        documents.push({
+          idCanal:  idCanal,
+          titulo:   dados[i].titulo,
+          conteudo: dados[i].conteudo,
+        });
+
     }
 
     documents = pln.processData(documents, true);

@@ -199,7 +199,10 @@ exports.processData   = function(data) {
 
   var tokenizer       = new natural.WordTokenizer();
   var stemmer         = new PortugueseStemmer();
-  var tags            = {};
+  var titulo          = {};
+  var conteudos       = [];
+  var conteudo        = null;
+
   var stopwordsConfig = {
     language:             "portuguese",
     remove_digits:        false,
@@ -209,34 +212,38 @@ exports.processData   = function(data) {
 
   for (var i = 0; i < data.length; i++) {
 
-    tags.titulo     = stopwords.extract(data[i].titulo,   stopwordsConfig);
-    tags.conteudo   = stopwords.extract(data[i].conteudo, stopwordsConfig);
+    titulo  = stopwords.extract(data[i].titulo,   stopwordsConfig);
+    titulo  = titulo.toString().replace(/,/gi, " ");
+    titulo  = removeAceents(titulo);
+    titulo  = titulo.replace(/[^a-z A-Z 0-9]/g,'');
+    titulo  = tokenizer.tokenize(titulo);
 
-    tags.titulo     = tags.titulo.toString().replace(/,/gi, " ");
-    tags.conteudo   = tags.conteudo.toString().replace(/,/gi, " ");
-
-    tags.titulo     = removeAceents(tags.titulo);
-    tags.conteudo   = removeAceents(tags.conteudo);
-
-    tags.titulo     = tags.titulo.replace(/[^a-z A-Z 0-9]/g,'');
-    tags.conteudo   = tags.conteudo.replace(/[^a-z A-Z 0-9]/g,'');
-
-    tags.titulo     = tokenizer.tokenize(tags.titulo);
-    tags.conteudo   = tokenizer.tokenize(tags.conteudo);
-
-    // (4) stemmering
-    for (var y = 0; y < tags.titulo.length; y++) {
-      tags.titulo[y] = stemmer.stemWord(tags.titulo[y]);
+    for (var y = 0; y < titulo.length; y++) {
+      titulo[y] = stemmer.stemWord(titulo[y]);
     }
 
-    for (var z = 0; z < tags.conteudo.length; z++) {
-      tags.conteudo[z] = stemmer.stemWord(tags.conteudo[z]);
+    for (var y = 0; y < data[i].conteudo.length; y++) {
+
+      conteudo    = stopwords.extract(data[i].conteudo[y], stopwordsConfig);
+      conteudo    = conteudo.toString().replace(/,/gi, " ");
+      conteudo    = removeAceents(conteudo);
+      conteudo    = conteudo.replace(/[^a-z A-Z 0-9]/g,'');
+      conteudo    = tokenizer.tokenize(conteudo);
+
+      for (var z = 0; z < conteudo.length; z++) {
+        conteudo [z] = stemmer.stemWord(conteudo[z]);
+      }
+
+      conteudos.push(conteudo);
+
     }
 
     data[i].tags = {
-      titulo: tags.titulo,
-      conteudo: tags.conteudo
+      titulo: titulo,
+      conteudo: conteudos
     };
+
+    conteudos = [];
 
   }
 

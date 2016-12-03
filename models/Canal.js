@@ -3,9 +3,9 @@ var mongoose        = require('mongoose'),
 
 var canalSchema = new mongoose.Schema({
   idBot:  { type: String, require: true },
-  nome:   { type: String, require: true },
+  nome:   { type: String, default: null },
   tipo:   { type: String, default: null },
-  endereco:   { type: String, default: null },
+  uri:   { type: String, default: null },
   dataCriacao:  { type: Date, require: true },
   ultimaColeta: { type: Date, require: true }
 });
@@ -13,15 +13,15 @@ var canalSchema = new mongoose.Schema({
 var documentSchema = new mongoose.Schema({
     idCanal:      { type: String },
     titulo:       { type: String },
-    conteudo:     { type: String },
+    conteudo:     [ String ],
     tags: {
-      titulo: [ String ],
-      conteudo: [ String ]
+      titulo:   [ String ],
+      conteudo: []
     }
 });
 
-var Canal =  mongoose.model('Canal', canalSchema);
-var Document =  mongoose.model('Document', documentSchema);
+var Canal     =  mongoose.model('Canal', canalSchema);
+var Document  =  mongoose.model('Document', documentSchema);
 
 exports.cadastrarCanal = function(dados, callback) {
   Canal.insertMany(dados, function(err, canal){
@@ -80,3 +80,16 @@ exports.consultarPeloIdBot = function(dados, callback) {
   });
 
 };
+
+exports.getAllChannels = function (callback) {
+  Canal.find().select('_id tipo uri').exec(function(err, channels) {
+
+    if (!channels || err) {
+      callback(true);
+      return;
+    }
+
+    callback(false, channels);
+
+  });
+}
