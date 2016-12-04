@@ -20,27 +20,14 @@ var Documento  =  mongoose.model('Documento', documentoSchema);
 
 exports.cadastrarDocumento = function(dados, callback) {
 
-  if(dados.length != 0) {
-    Documento.insertMany(dados, function(err, documentos){
-      if(err){
-        callback(true);
-        return;
-      }
-      callback(false, documentos);
-    });
-
-  } else {
-    var documento = new Documento(dados);
-
-    documento.save(function(err, documento){
-      if(err){
-        callback(true);
-        return;
-      }
-      callback(false, documento);
-    });
-  }
-
+  Documento.insertMany(dados, function(err, documentos){
+    if(err){
+      callback(true);
+      return;
+    }
+    callback(false, documentos);
+  });
+  
 }
 
 exports.consultarPeloIdBot = function(dados, callback) {

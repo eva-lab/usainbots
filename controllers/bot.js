@@ -309,6 +309,10 @@ function cadastrarDocumento (req, res, next) {
 
 function inserirDocumento (dados, callback) {
 
+    if(!dados.length) {
+      dados = [dados];
+    }
+    
     dados = pln.processData(dados, true);
 
     Documento.cadastrarDocumento(dados, function(err, documento){
