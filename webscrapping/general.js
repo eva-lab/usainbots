@@ -51,7 +51,7 @@ exports.getContentSimplePost = function (data, done) {
     data.titulo   = extractor.titulo;
     data.conteudo = extractor.conteudo;
 
-    done(false, data);
+    done(false, [data]);
 
   });
 
@@ -59,52 +59,71 @@ exports.getContentSimplePost = function (data, done) {
 
 
 //TODO
-exports.getContentWiki = function(selector){
+exports.getContentWiki = function(data, done){
 
-   if(selector.charset != 'utf8') {
-       body = iconv.decode(body, selector.charset);
-   }
+  if(data.charset != 'utf8') {
+    data.encoding = null;
+  }
 
-   var $ = cheerio.load(body);
+  request(data, function(err, res, body) {
 
-   var p = [];
-
-   var $extractor = $('#mw-extractor.conteudo');
-   var $h2      = $extractor.find('h2');
-   var $h3      = $extractor.find('h3');
-   var heading  = "";
-   var extractor  = "";
-   var data  = [];
-
-   $h2.each(function(i, elem) {
-
-    heading = $(this).children('.mw-headline').text().trim();
-    extractor = $(this).next('p').text().trim();
-
-    if(heading != "" && extractor != "") {
-      data.push({
-        title: heading,
-        extractor: extractor,
-      });
+    if(data.charset != 'utf8') {
+      body = iconv.decode(body, data.charset);
     }
 
+     var $ = cheerio.load(body);
+
+     var p = [];
+
+     var $extractor = $('#mw-content-text');
+     var $h2        = $extractor.find('h2');
+     var $h3        = $extractor.find('h3');
+     var titulo     = "";
+     var conteudo   = [];
+     var extract    = [];
+
+     $h2.each(function(i, elem) {
+
+      titulo = $(this).children('.mw-headline').text().trim();
+      conteudo = $(this).next('p').text().trim();
+
+      if(titulo != "" && conteudo != "") {
+        extract.push({
+          idBot:  data.idBot,
+          tipo:   data.tipo,
+          uri:    data.uri,
+          selector: data.selector || null,
+          dataCriacao: data.dataCriacao,
+          ultimaColeta: data.ultimaColeta,
+          titulo: titulo,
+          conteudo: [conteudo],
+        });
+      }
+
+     });
+
+     $h3.each(function(i, elem) {
+
+      titulo   = $(this).children('.mw-headline').text().trim();
+      conteudo = $(this).next('p').text().trim();
+
+      if(titulo != "" && conteudo != "") {
+        extract.push({
+          idBot:  data.idBot,
+          tipo:   data.tipo,
+          uri:    data.uri,
+          selector: data.selector || null,
+          dataCriacao: data.dataCriacao,
+          ultimaColeta: data.ultimaColeta,
+          titulo: titulo,
+          conteudo: [conteudo],
+        });
+      }
+
+     });
+
+     done(false, extract);
+
    });
-
-   $h3.each(function(i, elem) {
-
-    heading   = $(this).children('.mw-headline').text().trim();
-    extractor = $(this).next('p').text().trim();
-
-    if(heading != "" && extractor != "") {
-      data.push({
-        title: heading,
-        extractor: extractor,
-      });
-    }
-
-   });
-
-   data.extractor = extractor;
-   callback(false, data);
 
 };
