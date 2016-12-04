@@ -169,9 +169,6 @@ function consultar (req, res, next) {
           // com resposta
           var documentContent = pln.weightReply({ documents: documents, query: dados.query });
 
-          random = rn({ min: 0, max: botSentences.introducaoRespostas.length -1, integer: true });
-          documentContent = botSentences.introducaoRespostas[random] + "\n" + documentContent;
-
           return res.status(200).json({ resposta: documentContent });
 
         });
@@ -298,8 +295,6 @@ function cadastrarDocumento (req, res, next) {
 
       });
     }
-
-
 
   } else {
 

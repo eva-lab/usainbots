@@ -8,7 +8,6 @@ var botSchema = new mongoose.Schema({
   dataCriacao:        { type: Date },
   frases: {
     abertura:               [ String ],
-    introducaoRespostas:    [ String ],
     agradecimento:          [ String ],
     encerramento:           [ String ],
     semResposta:            [ String ],
@@ -63,11 +62,7 @@ exports.atualizar = function(dadosReq, callback) {
       if(dadosReq.dados.frases.abertura){
         dados.frases.abertura = dadosReq.dados.frases.abertura;
       }
-
-      if(dadosReq.dados.frases.introducaoRespostas){
-        dados.frases.introducaoRespostas = dadosReq.dados.frases.introducaoRespostas;
-      }
-
+      
       if(dadosReq.dados.frases.encerramento){
         dados.frases.encerramento = dadosReq.dados.frases.encerramento;
       }
