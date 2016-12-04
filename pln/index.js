@@ -206,7 +206,7 @@ exports.weightReply   = function(data) {
 
   for (var i = 0; i < weights.length; i++) {
     if(weights[i].weight > document.weight){
-      max = weights[i];
+      document = weights[i];
     }
   }
 
