@@ -20,15 +20,26 @@ var Documento  =  mongoose.model('Documento', documentoSchema);
 
 exports.cadastrarDocumento = function(dados, callback) {
 
-  var documento = new Documento(dados);
+  if(dados.length != 0) {
+    Documento.insertMany(dados, function(err, documentos){
+      if(err){
+        callback(true);
+        return;
+      }
+      callback(false, documentos);
+    });
 
-  documento.save(function(err, documento){
-    if(err){
-      callback(true);
-      return;
-    }
-    callback(false, documento);
-  });
+  } else {
+    var documento = new Documento(dados);
+
+    documento.save(function(err, documento){
+      if(err){
+        callback(true);
+        return;
+      }
+      callback(false, documento);
+    });
+  }
 
 }
 
