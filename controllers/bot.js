@@ -1,20 +1,20 @@
-var express     = require('express'),
-    router      = express.Router(),
-    auth        = require('../strategies/auth'),
-    moment      = require('moment'),
-    pln         = require('../pln'),
-    rn          = require('random-number'),
-    Bot         = require('../models/Bot'),
-    Canal       = require('../models/Canal'),
-    frases      = require('../config/frases'),
-    config      = require('../config/config');
+var express           = require('express'),
+    router            = express.Router(),
+    auth              = require('../strategies/auth'),
+    moment            = require('moment'),
+    pln               = require('../pln'),
+    rn                = require('random-number'),
+    Bot               = require('../models/Bot'),
+    Documento         = require('../models/Documento'),
+    frases            = require('../config/frases'),
+    config            = require('../config/config'),
+    webScrapping      = require('../webscrapping/');
 
 router.post('/bot/cadastrar',                 cadastrar);
 router.put('/bot/:id/atualizar',              atualizar);
 router.get('/bot/:id/consulta',               consultar);
 router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
-router.post('/bot/:id/canal/cadastrar',       cadastrarCanal);
-router.post('/canal/:id/document/cadastrar',  cadastrarDocument); //TODO: Remover rota e adaptar funcao ao crawler
+router.post('/bot/:id/documento/cadastrar',   cadastrarDocumento);
 
 function cadastrar (req, res, next) {
 
@@ -143,9 +143,7 @@ function consultar (req, res, next) {
 
         dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
 
-        Canal.consultarPeloIdBot(dados, function(err, documents){
-
-          console.log(botSentences);
+        Documento.consultarPeloIdBot(dados, function(err, documents) {
 
           if (err) {
             return res.status(500).json({
@@ -235,72 +233,73 @@ function remover (req, res, next) {
 
 }
 
-function cadastrarCanal (req, res, next) {
+function cadastrarDocumento (req, res, next) {
 
   if(req.params.id && req.body.dados) {
 
-    var dados   = req.body.dados || [];
-    var idBot   = req.params.id;
-    var data    = moment().format();
-    var canais  = [];
-    var valido  = true;
+    var dados       = req.body.dados || [];
+    var idBot       = req.params.id;
+    var data        = moment().format();
 
-    if(dados && dados.length > 0) {
+    if(!dados.tipo){
+      return res.status(400).json({
+        erro: 'bad_request',
+        mensagem: 'Erro de parâmetro(s)'
+      });
+    }
 
-      for (var i = 0; i < dados.length; i++) {
+    dados.dataCriacao  = data;
+    dados.ultimaColeta = data;
 
-        if(dados[i].uri && dados[i].tipo) {
-          dados[i].tipo = dados[i].tipo.toLowerCase();
+    if(dados.uri) {
 
-          if(config.channels.tipos.indexOf(dados[i].tipo) < 0){
-            valido = false;
-            break;
-          }
-        } else {
-          valido = false;
-          break;
-        }
-
-        canais.push({
-          idBot:        idBot,
-          nome:         dados[i].nome,
-          tipo:         dados[i].tipo,
-          uri:          dados[i].uri,
-          dataCriacao:  data,
-          ultimaColeta: data
-        });
-
-      }
-
-      if(!valido) {
-        return res.status(400).json({
-          erro: 'bad_request',
-          mensagem: 'Erro de parâmetro(s)'
-        });
-      }
-
-      Canal.cadastrarCanal(canais, function (err, canais) {
+      webScrapping.process(dados, function(err, dados){
 
         if(err) {
-          return res.status(500).json({
-            erro: 'internal_server_error',
-            mensagem: 'Erro interno'
+          return res.status(404).json({
+            erro: 'not_found',
+            mensagem: 'Página não encontrada'
           });
         }
 
-        res.status(200).json({
-          dados: canais,
-          mensagem: 'Canal(s) inserido(s) com sucesso!'
+        inserirDocumento(dados, function(err, dados){
+
+          if(err) {
+            return res.status(404).json({
+              erro: 'not_found',
+              mensagem: 'Página não encontrada'
+            });
+          }
+
+          res.status(200).json({
+            dados: dados,
+            mensagem: 'Documento inserido com sucesso!'
+          });
+
         });
 
       });
 
     } else {
-      res.status(400).json({
-        erro: 'bad_request',
-        mensagem: 'Erro de parâmetro(s)'
+
+      inserirDocumento(dados, function(err, dados){
+
+        if(err) {
+          return res.status(404).json({
+            erro: 'not_found',
+            mensagem: 'Página não encontrada'
+          });
+        }
+
+        res.status(200).json({
+          dados: dados,
+          mensagem: 'Documento inserido com sucesso!'
+        });
+
       });
     }
+
+
 
   } else {
 
@@ -313,43 +312,20 @@ function cadastrarCanal (req, res, next) {
 
 }
 
-function cadastrarDocument (req, res, next) {
+function inserirDocumento (dados, callback) {
 
-  if(req.params.id && req.body.dados) {
+    dados = pln.processData([dados], true);
 
-    var dados       = req.body.dados || [];
-    var idCanal     = req.params.id;
-    var documents   = [];
-
-    for (var i = 0; i < dados.length; i++) {
-
-        documents.push({
-          idCanal:  idCanal,
-          titulo:   dados[i].titulo,
-          conteudo: dados[i].conteudo,
-        });
-
-    }
-
-    documents = pln.processData(documents, true);
-
-    Canal.cadastrarDocuments(documents, function(err, documents){
+    Documento.cadastrarDocumento(dados[0], function(err, documento){
 
       if(err) {
-        return res.status(500).json({
-          erro: 'internal_server_error',
-          mensagem: 'Erro interno'
-        });
+        callback(true);
       }
 
-      res.status(200).json({
-        dados: documents,
-        mensagem: 'Document(s) inserido(s) com sucesso!'
-      });
+      callback(false, documento);
 
     });
 
-  }
 }
 
 module.exports = router;

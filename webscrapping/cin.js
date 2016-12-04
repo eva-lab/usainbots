@@ -1,8 +1,6 @@
 var request   = require('request'),
     cheerio   = require('cheerio'),
     iconv     = require('iconv-lite'),
-    moment    = require('moment'),
-    pln       = require('../../pln'),
     exports   = module.exports;
 
 exports.getNews = function(){
