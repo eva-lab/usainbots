@@ -1,9 +1,10 @@
 {
   "abertura": [
-    "Olá! no que posso ajudar?",
-    "Oi! Seja bem vindo, no que posso ajudar?",
-    "Oi, posso ajudá-lo?",
-    "Hi! precisa de algo?"
+    "Olá! eu sou o Usain Bot, no que posso ajudar?",
+    "Oi! Seja bem vindo, eu sou o Usain Bot, no que posso ajudar?",
+    "Oi, eu sou o Usain Bot, posso ajudá-lo?",
+    "Hi! eu sou o Usain Bot, precisa de algo?",
+    "Oi! eu sou o Usain Bot, o seu robô do Centro de Informática. Você tem alguma coisa para me perguntar?"
   ],
   "agradecimento": [
     "Por nada!",

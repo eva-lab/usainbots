@@ -144,7 +144,27 @@ function consultar (req, res, next) {
         botSentences.encerramento = frases.encerramento
       }
 
-      if (classify == 'questionamento'){
+      if(!botSentences.abertura || botSentences.abertura.length < 1){
+        botSentences.abertura = frases.abertura
+      }
+
+      if(!botSentences.engajamento || botSentences.engajamento.length < 1){
+        botSentences.engajamento = frases.engajamento
+      }
+
+      console.log(dados.query);
+
+      console.log(classify);
+
+      if (classify == 'apresentacao') {
+
+
+        random      = rn({ min: 0, max: botSentences.abertura.length-1, integer: true });
+        resposta    = botSentences.abertura[random];
+
+        return res.status(200).json({ resposta: resposta });
+
+      } else if (classify == 'questionamento'){
 
         dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
 
@@ -158,12 +178,12 @@ function consultar (req, res, next) {
           } else if(!documents || documents == "") {
 
             // sem resposta
-            quantidade    = botSentences.semResposta.length -1;
+            quantidade    = botSentences.semResposta.length-1;
             random        = rn({ min: 0, max: quantidade, integer: true });
             resposta      = botSentences.semResposta[random];
 
             // sem resposta  -> engajamento
-            quantidade    = botSentences.engajamento.length -1;
+            quantidade    = botSentences.engajamento.length-1;
             random        = rn({ min: 0, max: quantidade, integer: true });
             resposta      = resposta + "\n" + botSentences.engajamento[random];
 
@@ -180,21 +200,21 @@ function consultar (req, res, next) {
 
       } else if (classify == 'agradecimento'){
 
-        random      = rn({ min: 0, max: botSentences.agradecimento.length -1, integer: true });
+        random      = rn({ min: 0, max: botSentences.agradecimento.length-1, integer: true });
         resposta    = botSentences.agradecimento[random];
 
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'encerramento'){
 
-        random      = rn({ min: 0, max: botSentences.encerramento.length -1, integer: true });
+        random      = rn({ min: 0, max: botSentences.encerramento.length-1, integer: true });
         resposta    = botSentences.encerramento[random];
 
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'abertura') {
 
-        random      = rn({ min: 0, max: botSentences.engajamento.length -1, integer: true });
+        random      = rn({ min: 0, max: botSentences.engajamento.length-1, integer: true });
         resposta    = botSentences.engajamento[random];
 
         return res.status(200).json({ resposta: resposta });
@@ -225,6 +245,22 @@ function consultar (req, res, next) {
           return res.status(200).json({ tipo:'eventos', dados: eventos });
 
         });
+      } else {
+
+        console.log('caiu aqui');
+
+        // sem resposta
+        quantidade    = botSentences.semResposta.length-1;
+        random        = rn({ min: 0, max: quantidade, integer: true });
+        resposta      = botSentences.semResposta[random];
+
+        // sem resposta  -> engajamento
+        quantidade    = botSentences.engajamento.length-1;
+        random        = rn({ min: 0, max: quantidade, integer: true });
+        resposta      = resposta + "\n" + botSentences.engajamento[random];
+
+        return res.status(200).json({ resposta: resposta });
+
       }
 
     });
