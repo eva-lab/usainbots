@@ -62,7 +62,7 @@ exports.atualizar = function(dadosReq, callback) {
       if(dadosReq.dados.frases.abertura){
         dados.frases.abertura = dadosReq.dados.frases.abertura;
       }
-      
+
       if(dadosReq.dados.frases.encerramento){
         dados.frases.encerramento = dadosReq.dados.frases.encerramento;
       }

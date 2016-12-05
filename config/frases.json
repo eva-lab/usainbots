@@ -2,23 +2,25 @@
   "abertura": [
     "Olá! no que posso ajudar?",
     "Oi! Seja bem vindo, no que posso ajudar?",
-    "Oi, posso ajudá-lo?"
+    "Oi, posso ajudá-lo?",
+    "Hi! precisa de algo?"
   ],
   "agradecimento": [
     "Por nada!",
     "Nada!",
-    "Foi um prazer!"
+    "Foi um prazer!",
+    "Não há de quê!"
   ],
   "engajamento": [
-    "Posso te ajduar em mais alguma coisa?",
-    "Você está precisando de mais alguma coisa?",
-    "Você precisa de mais alguma coisa?"
+    "Posso te ajudar?",
+    "Você está precisando de algo?",
+    "Você precisa alguma coisa?"
   ],
   "encerramento": [
     "Foi bom conversar com você! :D",
-    "Espero te ver em breve! Até mais.",
+    "Espero te ver em breve! Até mais!",
     "Bacana! Até mais então",
-    "Até mais! tenha um ótimo dia ;)"
+    "Até mais! tenha um ótimo dia!"
   ],
   "semResposta": [
     "Humm... eu não sei nada sobre isso...",

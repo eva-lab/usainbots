@@ -8,7 +8,9 @@ var express           = require('express'),
     Documento         = require('../models/Documento'),
     frases            = require('../config/frases'),
     config            = require('../config/config'),
-    webScrapping      = require('../webscrapping/');
+    webScrapping      = require('../webscrapping/'),
+    natural           = require('natural'),
+    treino            = require('../config/treino');
 
 router.post('/bot/cadastrar',                 cadastrar);
 router.put('/bot/:id/atualizar',              atualizar);
@@ -116,27 +118,26 @@ function consultar (req, res, next) {
         });
       }
 
-      var botSentences    = bot.frases;
       var random          = null;
       var resposta        = null;
+      var botSentences    = bot.frases;
 
-      // (1) tratamento
-      dados.query = pln.processQuery(sentenceOriginal, { stemmering: true, lowercase: true });
+      dados.query = pln.processQuery(sentenceOriginal, { stemmering: true, lowercase: true, accent: true });
 
-      // (2) classificar
       var classify = pln.classifier(dados.query);
 
-      // (3) sem respostas
-      if (botSentences.semResposta.length < 1) {
-        botSentences.semResposta = frases.semResposta;
+      console.log(classify);
+
+      if(!botSentences.semResposta || botSentences.semResposta.length < 1){
+        botSentences.semResposta = frases.semResposta
       }
 
-      if (botSentences.agradecimento.length < 1) {
-        botSentences.agradecimento = frases.agradecimento;
+      if(!botSentences.agradecimento || botSentences.agradecimento.length < 1){
+        botSentences.agradecimento = frases.agradecimento
       }
 
-      if (botSentences.encerramento.length < 1) {
-        botSentences.encerramento = frases.encerramento;
+      if(!botSentences.encerramento || botSentences.encerramento.length < 1){
+        botSentences.encerramento = frases.encerramento
       }
 
       if (classify == 'questionamento'){
@@ -184,6 +185,13 @@ function consultar (req, res, next) {
 
         random      = rn({ min: 0, max: botSentences.encerramento.length -1, integer: true });
         resposta    = botSentences.encerramento[random];
+
+        return res.status(200).json({ resposta: resposta });
+
+      } else if (classify == 'abertura') {
+
+        random      = rn({ min: 0, max: botSentences.engajamento.length -1, integer: true });
+        resposta    = botSentences.engajamento[random];
 
         return res.status(200).json({ resposta: resposta });
 
@@ -312,7 +320,7 @@ function inserirDocumento (dados, callback) {
     if(!dados.length) {
       dados = [dados];
     }
-    
+
     dados = pln.processData(dados, true);
 
     Documento.cadastrarDocumento(dados, function(err, documento){

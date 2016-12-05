@@ -2,6 +2,7 @@ var natural               = require('natural'),
     moment                = require('moment'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
     stopwords             = require("keyword-extractor"),
+    treino                 = require("../config/treino"),
     exports               = module.exports;
 
 
@@ -40,7 +41,6 @@ exports.processQuery  = function (query, options){
       characters :  true,
       tokenizer:    true,
       stemmering :  true,
-      connective:   true,
       stopwords:    true
     };
 
@@ -92,30 +92,14 @@ exports.processQuery  = function (query, options){
         query[i] = stemmer.stemWord(query[i]);
       }
 
-      //(5) untokenizer
       query = query.toString();
       query = query.replace(/,/gi, " ");
 
     } else {
-      // (4) stemmering
       for (var i = 0; i < query.length; i++) {
         query[i] = stemmer.stemWord(query[i]);
       }
     }
-  }
-
-  // (5) remover conectivos
-  if(config.conectivos){
-
-    if(!config.tokenizer) query = query.split(" ");
-
-    query = removerConectivos(query);
-
-    if(!config.tokenizer){
-      query = query.toString();
-      query = query.replace(/,/gi, " ");
-    }
-
   }
 
   return query;
@@ -126,23 +110,9 @@ exports.classifier    = function (query) {
 
   var classifier  = new natural.BayesClassifier();
 
-  // agradecimento
-  classifier.addDocument(['muit','obrig'], 'agradecimento');
-  classifier.addDocument(['muit','obrig'], 'agradecimento');
-  classifier.addDocument(['fic','grat'], 'agradecimento');
-
-  // encerramento
-  classifier.addDocument(['ate','logo'], 'encerramento');
-  classifier.addDocument(['tchau'], 'encerramento');
-  classifier.addDocument(['xau'], 'encerramento');
-
-  // questionamento
-  classifier.addDocument(['?'], 'questionamento');
-  classifier.addDocument(['gost'], 'questionamento');
-  classifier.addDocument(['eu','prec'], 'questionamento');
-  classifier.addDocument(['eu','gost','sab'], 'questionamento');
-  classifier.addDocument(['eu','necess'], 'questionamento');
-  classifier.addDocument(['eu','necess','sab'], 'questionamento');
+  for (var i = 0; i < treino.dados.length; i++) {
+    classifier.addDocument(treino.dados[i].frase, treino.dados[i].classificacao);
+  }
 
   classifier.train();
 
@@ -265,7 +235,6 @@ exports.processData   = function(data) {
     conteudos = [];
 
   }
-  console.log(data);
 
   return data;
 
