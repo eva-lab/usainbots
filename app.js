@@ -2,6 +2,7 @@ var express       = require('express'),
     bodyParser    = require('body-parser'),
     app           = express(),
     loader        = require('./lib/loader'),
+    cronjobs      = require('./lib/cronjobs'),
     cookieParser  = require('cookie-parser'),
     mongoose      = require('mongoose'),
     config        = require('./config/config');
@@ -41,3 +42,6 @@ mongoose.connect(config.bd.host + config.bd.name, function(err){
 app.listen(config.port, function () {
   console.log('. sevico rodando na porta ' + config.port);
 });
+
+//cronjobs
+cronjobs.start();

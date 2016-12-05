@@ -4,20 +4,26 @@ var express           = require('express'),
     moment            = require('moment'),
     pln               = require('../pln'),
     rn                = require('random-number'),
-    Bot               = require('../models/Bot'),
-    Documento         = require('../models/Documento'),
     frases            = require('../config/frases'),
     config            = require('../config/config'),
     webScrapping      = require('../webscrapping/'),
     natural           = require('natural'),
     treino            = require('../config/treino');
 
+// Models
+var Bot               = require('../models/Bot'),
+    Documento         = require('../models/Documento'),
+    Noticia           = require('../models/Noticia'),
+    Evento            = require('../models/Evento');
+
+// Rotas
 router.post('/bot/cadastrar',                 cadastrar);
 router.put('/bot/:id/atualizar',              atualizar);
 router.get('/bot/:id/consulta',               consultar);
 router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
 router.post('/bot/:id/documento/cadastrar',   cadastrarDocumento);
 
+// Callbacks
 function cadastrar (req, res, next) {
 
   if(req.body.dados) {
@@ -126,8 +132,6 @@ function consultar (req, res, next) {
 
       var classify = pln.classifier(dados.query);
 
-      console.log(classify);
-
       if(!botSentences.semResposta || botSentences.semResposta.length < 1){
         botSentences.semResposta = frases.semResposta
       }
@@ -195,6 +199,32 @@ function consultar (req, res, next) {
 
         return res.status(200).json({ resposta: resposta });
 
+      } else if (classify == 'noticias') {
+        Noticia.pegar(function(err, noticias){
+
+          if (err || !noticias) {
+            return res.status(404).json({
+              erro: 'not_found',
+              mensagem: 'Não foi encontrada nenhuma noticia'
+            });
+          }
+
+          return res.status(200).json({ tipo:'noticias', dados: noticias });
+
+        });
+      } else if (classify == 'eventos') {
+        Evento.pegar(function(err, eventos){
+
+          if (err || !eventos) {
+            return res.status(404).json({
+              erro: 'not_found',
+              mensagem: 'Não foi encontrado nenhum evento'
+            });
+          }
+
+          return res.status(200).json({ tipo:'eventos', dados: eventos });
+
+        });
       }
 
     });

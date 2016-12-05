@@ -20,9 +20,7 @@
     { "frase": "com faz par", "classificacao": "questionamento" },
     { "frase": "com eu poss", "classificacao": "questionamento" },
     { "frase": "qual o proced par", "classificacao": "questionamento" },
-    { "frase": "praz em conhec voc", "classificacao": "cumprimento" },
-    { "frase": "muit praz", "classificacao": "cumprimento" },
-    { "frase": "com vai voc ?", "classificacao": "cumprimento" },
-    { "frase": "com voc est ?", "classificacao": "cumprimento" }
+    { "frase": "notic", "classificacao": "noticias" },
+    { "frase": "event", "classificacao": "eventos" }
   ]
 }

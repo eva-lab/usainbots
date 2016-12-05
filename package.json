@@ -18,6 +18,7 @@
     "mongoose": "*",
     "mongoose-searchable": "^1.0.0",
     "natural": "^0.4.0",
+    "node-cron": "^1.1.2",
     "random-number": "0.0.7",
     "request": "^2.75.0",
     "snowball-stemmer.jsx": "^0.2.3",

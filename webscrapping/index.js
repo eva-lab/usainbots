@@ -15,11 +15,11 @@ exports.process = function(data, done) {
 
   } else if(data.tipo == 'cin-noticias') {
 
-    CIn.getNews(data, done);
+    CIn.getNews(done);
 
   } else if(data.tipo == 'cin-eventos') {
 
-    CIn.getEvents(data, done);
+    CIn.getEvents(done);
 
   }
 
