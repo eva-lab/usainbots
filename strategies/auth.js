@@ -2,7 +2,6 @@
 var jwt       = require('jsonwebtoken'),
     config    = require('../config/config'),
     Usuario   = require('../models/Usuario'),
-    Script    = require('../models/Script'),
     exports   = module.exports;
 
 // Verificar validade do Token

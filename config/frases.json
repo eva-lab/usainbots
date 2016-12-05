@@ -1,0 +1,32 @@
+{
+  "abertura": [
+    "Olá! eu sou o Usain Bot, no que posso ajudar?",
+    "Oi! Seja bem vindo, eu sou o Usain Bot, no que posso ajudar?",
+    "Oi, eu sou o Usain Bot, posso ajudá-lo?",
+    "Hi! eu sou o Usain Bot, precisa de algo?",
+    "Oi! eu sou o Usain Bot, o seu robô do Centro de Informática. Você tem alguma coisa para me perguntar?"
+  ],
+  "agradecimento": [
+    "Por nada!",
+    "Nada!",
+    "Foi um prazer!",
+    "Não há de quê!"
+  ],
+  "engajamento": [
+    "Posso te ajudar?",
+    "Você está precisando de algo?",
+    "Você precisa alguma coisa?"
+  ],
+  "encerramento": [
+    "Foi bom conversar com você! :D",
+    "Espero te ver em breve! Até mais!",
+    "Bacana! Até mais então",
+    "Até mais! tenha um ótimo dia!"
+  ],
+  "semResposta": [
+    "Humm... eu não sei nada sobre isso...",
+    "Xii! To por fora desse assunto...",
+    "É amigo, realmente não sei nada sobre isso...",
+    "Foi mal, mas acho que não sei te responder..."
+  ]
+}

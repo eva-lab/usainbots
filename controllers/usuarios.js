@@ -1,7 +1,6 @@
 var express     = require('express'),
     router      = express.Router(),
     Usuario     = require('../models/Usuario'),
-    Script      = require('../models/Script'),
     auth        = require('../strategies/auth'),
     Bot         = require('../models/Bot');
 

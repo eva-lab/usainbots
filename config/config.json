@@ -9,5 +9,8 @@
   "bd": {
     "host": "mongodb://localhost/",
     "name": "usainbot"
+  },
+  "channels": {
+    "tipos": ["simple-post", "wiki", "pdf"]
   }
 }

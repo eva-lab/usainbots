@@ -1,16 +1,28 @@
-var mongoose = require('mongoose');
-var exports  = module.exports;
+var mongoose  = require('mongoose'),
+    frases    = require('../config/frases'),
+    exports   = module.exports;
 
 var botSchema = new mongoose.Schema({
-  idUsuario:      { type: String, require: true },
-  nome:           { type: String, require: true },
-  dataCriacao:    { type: Date }
+  idUsuario:          { type: String, require: true },
+  nome:               { type: String, require: true },
+  dataCriacao:        { type: Date },
+  frases: {
+    abertura:               [ String ],
+    agradecimento:          [ String ],
+    encerramento:           [ String ],
+    semResposta:            [ String ],
+    engajamento:            [ String ]
+  }
 });
 
 var Bot =  mongoose.model('Bot', botSchema);
 
 // Cadastrar um Bot
 exports.cadastrar = function(dados, callback) {
+
+  if(!dados.frases) {
+    dados.frases = frases;
+  }
 
   var bot = new Bot(dados);
 
@@ -23,7 +35,8 @@ exports.cadastrar = function(dados, callback) {
         idBot:        dados._id,
         idUsuario:    dados.idUsuario,
         nome:         dados.nome,
-        dataCriacao:  dados.dataCriacao
+        dataCriacao:  dados.dataCriacao,
+        frases:       dados.frases
       });
     }
 
@@ -46,6 +59,26 @@ exports.atualizar = function(dadosReq, callback) {
         dados.nome = dadosReq.dados.nome;
       }
 
+      if(dadosReq.dados.frases.abertura){
+        dados.frases.abertura = dadosReq.dados.frases.abertura;
+      }
+
+      if(dadosReq.dados.frases.encerramento){
+        dados.frases.encerramento = dadosReq.dados.frases.encerramento;
+      }
+
+      if(dadosReq.dados.frases.semResposta){
+        dados.frases.semResposta = dadosReq.dados.frases.semResposta;
+      }
+
+      if(dadosReq.dados.frases.agradecimento){
+        dados.frases.agradecimento = dadosReq.dados.frases.agradecimento;
+      }
+
+      if(dadosReq.dados.frases.engajamento){
+        dados.frases.engajamento = dadosReq.dados.frases.engajamento;
+      }
+
       dados.save(function(err){
         if(err){
           callback(true, err);
@@ -55,6 +88,7 @@ exports.atualizar = function(dadosReq, callback) {
             idUsuario:   dados.idUsuario,
             nome:        dados.nome,
             dataCriacao: dados.dataCriacao,
+            frases:      dados.frases
           });
         }
       });
@@ -91,12 +125,28 @@ exports.pegarPeloIdUsuario = function(id, callback) {
       var dadosBot = [];
       for (var i = 0; i < dados.length; i++) {
         dadosBot.push({
-          idBot: dados[i]._id,
-          nome: dados[i].nome,
-          dataCriacao: dados[i].dataCriacao,
+          idBot:        dados[i]._id,
+          nome:         dados[i].nome,
+          dataCriacao:  dados[i].dataCriacao,
+          frases:       dados[i].frases
         });
       }
       callback(false, dadosBot);
+    }
+
+  });
+
+};
+
+// Pegar pelo ID de um Bot
+exports.pegarPeloIdBot = function(id, callback) {
+
+  Bot.findById(id, function(err, bot){
+
+    if (!bot || err){
+      callback(true);
+    } else {
+      callback(false, bot);
     }
 
   });
