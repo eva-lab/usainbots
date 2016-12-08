@@ -217,7 +217,7 @@ function consultar (req, res, next) {
             });
           }
 
-          return res.status(200).json({ tipo:'noticias', dados: noticias });
+          return res.status(200).json({ tipo:'noticias', noticias: noticias });
 
         });
       } else if (classify == 'eventos') {
@@ -230,7 +230,7 @@ function consultar (req, res, next) {
             });
           }
 
-          return res.status(200).json({ tipo:'eventos', dados: eventos });
+          return res.status(200).json({ tipo:'eventos', eventos: eventos });
 
         });
       } else {
