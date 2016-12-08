@@ -16,6 +16,7 @@
     "keyword-extractor": "0.0.13",
     "moment": "^2.15.2",
     "mongoose": "*",
+    "mongoose-random": "^0.1.1",
     "mongoose-searchable": "^1.0.0",
     "natural": "^0.4.0",
     "node-cron": "^1.1.2",

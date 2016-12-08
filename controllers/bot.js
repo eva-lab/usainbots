@@ -113,7 +113,7 @@ function consultar (req, res, next) {
   if (req.params.id && req.query.q) {
 
     var sentenceOriginal = req.query.q;
-    var dados = { idBot : req.params.id, query : null };
+    var dados = { idBot : req.params.id, query : null, limite: 5};
 
     Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
 
@@ -152,71 +152,59 @@ function consultar (req, res, next) {
         botSentences.engajamento = frases.engajamento
       }
 
-      console.log(dados.query);
-
-      console.log(classify);
-
       if (classify == 'apresentacao') {
 
-
-        random      = rn({ min: 0, max: botSentences.abertura.length-1, integer: true });
-        resposta    = botSentences.abertura[random];
-
+        resposta = respostaRandom(botSentences.abertura);
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'questionamento'){
 
         dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
 
-        Documento.consultarPeloIdBot(dados, function(err, documents) {
+        Documento.consultarPeloIdBot(dados, function(err, documentos) {
 
           if (err) {
             return res.status(500).json({
               erro: 'internal_server_error',
               mensagem: 'Erro Interno'
             });
-          } else if(!documents || documents == "") {
+          } else if(!documentos || documentos == "") {
 
-            // sem resposta
-            quantidade    = botSentences.semResposta.length-1;
-            random        = rn({ min: 0, max: quantidade, integer: true });
-            resposta      = botSentences.semResposta[random];
+            Documento.consultarRandom(dados, function(err, documentos) {
 
-            // sem resposta  -> engajamento
-            quantidade    = botSentences.engajamento.length-1;
-            random        = rn({ min: 0, max: quantidade, integer: true });
-            resposta      = resposta + "\n" + botSentences.engajamento[random];
+              resposta = respostaRandom(botSentences.semResposta);
+              resposta = resposta + "\n" + respostaRandom(botSentences.engajamento);
 
-            return res.status(200).json({ resposta: resposta });
+              return res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
+
+            });
+
+          } else {
+
+            // com resposta
+            resposta = pln.weightReply({ documents: documentos, query: dados.query });
+
+            Documento.consultarRandom(dados, function(err, documentos) {
+              res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
+            });
 
           }
-
-          // com resposta
-          var documentContent = pln.weightReply({ documents: documents, query: dados.query });
-
-          return res.status(200).json({ resposta: documentContent });
 
         });
 
       } else if (classify == 'agradecimento'){
 
-        random      = rn({ min: 0, max: botSentences.agradecimento.length-1, integer: true });
-        resposta    = botSentences.agradecimento[random];
-
+        resposta = respostaRandom(botSentences.agradecimento);
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'encerramento'){
 
-        random      = rn({ min: 0, max: botSentences.encerramento.length-1, integer: true });
-        resposta    = botSentences.encerramento[random];
-
+        resposta = respostaRandom(botSentences.encerramento);
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'abertura') {
 
-        random      = rn({ min: 0, max: botSentences.engajamento.length-1, integer: true });
-        resposta    = botSentences.engajamento[random];
-
+        resposta = respostaRandom(botSentences.engajamento);
         return res.status(200).json({ resposta: resposta });
 
       } else if (classify == 'noticias') {
@@ -247,19 +235,14 @@ function consultar (req, res, next) {
         });
       } else {
 
-        console.log('caiu aqui');
+        Documento.consultarRandom(dados, function(err, documentos) {
 
-        // sem resposta
-        quantidade    = botSentences.semResposta.length-1;
-        random        = rn({ min: 0, max: quantidade, integer: true });
-        resposta      = botSentences.semResposta[random];
+          resposta = respostaRandom(botSentences.semResposta);
+          resposta = resposta + "\n" + respostaRandom(botSentences.engajamento);
 
-        // sem resposta  -> engajamento
-        quantidade    = botSentences.engajamento.length-1;
-        random        = rn({ min: 0, max: quantidade, integer: true });
-        resposta      = resposta + "\n" + botSentences.engajamento[random];
+          res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
 
-        return res.status(200).json({ resposta: resposta });
+        });
 
       }
 
@@ -271,6 +254,14 @@ function consultar (req, res, next) {
       mensagem: 'Erro(s) de parâmetro(s)'
     });
   }
+
+}
+
+function respostaRandom (sentenca) {
+
+  var random = rn({ min: 0, max: sentenca.length-1, integer: true });
+
+  return sentenca[random];
 
 }
 

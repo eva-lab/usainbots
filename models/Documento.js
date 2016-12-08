@@ -1,4 +1,5 @@
 var mongoose        = require('mongoose'),
+    random          = require('mongoose-random'),
     exports         = module.exports;
 
 var documentoSchema = new mongoose.Schema({
@@ -15,6 +16,7 @@ var documentoSchema = new mongoose.Schema({
   dataCriacao:  { type: Date, require: true },
   ultimaColeta: { type: Date, require: true }
 });
+documentoSchema.plugin(random, { path: 'r' });
 
 var Documento  =  mongoose.model('Documento', documentoSchema);
 
@@ -27,8 +29,8 @@ exports.cadastrarDocumento = function(dados, callback) {
     }
     callback(false, documentos);
   });
-  
-}
+
+};
 
 exports.consultarPeloIdBot = function(dados, callback) {
 
@@ -58,5 +60,20 @@ exports.consultarPeloIdBot = function(dados, callback) {
        }
        callback(false, documentos);
    });
+
+};
+
+exports.consultarRandom = function(dados, callback){
+
+  var filter = { idBot: dados.idBot };
+  var fields = { titulo: 1, _id: 0 };
+  var options = { skip: 2, limit: 5 };
+
+  Documento.findRandom(filter, fields, options, function (err, documentos) {
+    if(err) return callback(true);
+
+    callback(false, documentos);
+  });
+
 
 };
