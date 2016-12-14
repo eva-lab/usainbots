@@ -298,18 +298,17 @@ function cadastrarDocumento (req, res, next) {
   if(req.params.id && req.body.dados) {
 
     var dados       = req.body.dados || [];
+    var tipo        = req.body.tipo || req.body.dados.tipo;
     var idBot       = req.params.id;
     var data        = moment().format();
 
-    if(!dados.tipo){
+    if(!tipo){
       return res.status(400).json({
-        erro: 'bad_request',
         mensagem: 'Erro de parâmetro(s)'
       });
     }
 
     dados.dataCriacao  = data;
-    dados.ultimaColeta = data;
 
     if(dados.uri) {
 

@@ -54,10 +54,9 @@ function atualizar (req, res, next) {
 
 function pegarBot (req, res, next) {
 
-  console.log(req.params.id);
   if(req.params.id) {
 
-    Bot.pegarPeloIdUsuario(req.params.id, function(err, dadosBot){
+    Bot.pegarPeloIdApp(req.params.id, function(err, dadosBot){
 
       if(err) return res.status(500).json({
         mensagem: 'Erro Interno'
