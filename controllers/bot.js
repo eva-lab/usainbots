@@ -16,14 +16,12 @@ var Bot               = require('../models/Bot'),
     Noticia           = require('../models/Noticia'),
     Evento            = require('../models/Evento');
 
-// Rotas
-router.post('/bot/cadastrar',                 cadastrar);
-router.put('/bot/:id/atualizar',              atualizar);
-router.get('/bot/:id/consulta',               consultar);
+router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
+router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
+router.get('/bot/:id/consulta',               auth.isAuthenticated, consultar);
 router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
-router.post('/bot/:id/documento/cadastrar',   cadastrarDocumento);
+router.post('/bot/:id/documento/cadastrar',   auth.isAuthenticated, cadastrarDocumento);
 
-// Callbacks
 function cadastrar (req, res, next) {
 
   if(req.body.dados) {

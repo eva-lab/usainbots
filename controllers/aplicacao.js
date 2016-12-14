@@ -1,20 +1,15 @@
 var express     = require('express'),
     router      = express.Router(),
-    Usuario     = require('../models/Usuario'),
+    Applicacao  = require('../models/Aplicacao'),
     auth        = require('../strategies/auth'),
     Bot         = require('../models/Bot');
 
-// rotas
+router.post('/app/cadastrar',           auth.signup);
+router.put('/app/:id/atualizar',        auth.isAuthenticated, atualizar);
+router.put('/app/:id/atualizar/token',  auth.refreshToken);
+router.get('/app/:id/bots/',            auth.isAuthenticated, pegarBot);
 
-// TODO: ARRUMAR NO CREATOR
-router.post('/usuario/cadastrar',     auth.signup);
-router.put('/usuario/:id/atualizar',  auth.isAuthenticated, atualizarUsuario);
-router.post('/usuario/login',         auth.signin);
-router.get('/usuario/:id/bots/',      auth.isAuthenticated, pegarBotsUsuarioPeloId);
-
-// funcoes
-
-function atualizarUsuario (req, res, next) {
+function atualizar (req, res, next) {
 
   if(req.body.dados) {
 
@@ -23,7 +18,7 @@ function atualizarUsuario (req, res, next) {
       dados: req.body.dados
     };
 
-    Usuario.atualizar(data.dados, function(err, dados){
+    Aplicacao.atualizar(data.dados, function(err, dados){
 
       if(err) {
         res.status(400).json({
@@ -57,14 +52,14 @@ function atualizarUsuario (req, res, next) {
 
 }
 
-function pegarBotsUsuarioPeloId (req, res, next) {
+function pegarBot (req, res, next) {
 
+  console.log(req.params.id);
   if(req.params.id) {
 
     Bot.pegarPeloIdUsuario(req.params.id, function(err, dadosBot){
 
       if(err) return res.status(500).json({
-        erro: 'internal_server_error',
         mensagem: 'Erro Interno'
       });
 
@@ -77,7 +72,6 @@ function pegarBotsUsuarioPeloId (req, res, next) {
   } else {
 
     res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro de parâmetro(s)'
     });
 
@@ -85,5 +79,4 @@ function pegarBotsUsuarioPeloId (req, res, next) {
 
 }
 
-// exports
 module.exports = router;
