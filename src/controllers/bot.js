@@ -1,20 +1,13 @@
 var express           = require('express'),
     router            = express.Router(),
-    auth              = require('../strategies/auth'),
     moment            = require('moment'),
-    pln               = require('../pln'),
     rn                = require('random-number'),
-    frases            = require('../config/frases'),
-    config            = require('../config/config'),
-    webScrapping      = require('../webscrapping/'),
     natural           = require('natural'),
-    treino            = require('../config/treino');
-
-// Models
-var Bot               = require('../models/Bot'),
-    Documento         = require('../models/Documento'),
-    Noticia           = require('../models/Noticia'),
-    Evento            = require('../models/Evento');
+    auth              = require('../../middlewares/auth'),
+    pln               = require('../../modules/pln'),
+    webScrapping      = require('../../modules/webscrapping/'),
+    Bot               = require('../models/Bot'),
+    Documento         = require('../models/Documento');
 
 router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);

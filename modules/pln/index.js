@@ -2,9 +2,7 @@ var natural               = require('natural'),
     moment                = require('moment'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
     stopwords             = require("keyword-extractor"),
-    treino                 = require("../config/treino"),
     exports               = module.exports;
-
 
 function removeAceents (query){
   var expression = null;
@@ -110,9 +108,9 @@ exports.classifier    = function (query) {
 
   var classifier  = new natural.BayesClassifier();
 
-  for (var i = 0; i < treino.dados.length; i++) {
-    classifier.addDocument(treino.dados[i].frase, treino.dados[i].classificacao);
-  }
+  // for (var i = 0; i < treino.dados.length; i++) {
+  //   classifier.addDocument(treino.dados[i].frase, treino.dados[i].classificacao);
+  // }
 
   classifier.train();
 

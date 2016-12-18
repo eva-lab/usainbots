@@ -1,6 +1,6 @@
 {
   "name": "API - UsainBot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "host": "http://localhost",
   "port": "8080",
   "secret": {
@@ -8,9 +8,6 @@
   },
   "bd": {
     "host": "mongodb://localhost/",
-    "name": "usainbot"
-  },
-  "channels": {
-    "tipos": ["simple-post", "wiki", "pdf"]
+    "name": "usainbots"
   }
 }

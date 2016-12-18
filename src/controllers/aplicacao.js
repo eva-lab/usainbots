@@ -1,12 +1,12 @@
 var express     = require('express'),
     router      = express.Router(),
     Applicacao  = require('../models/Aplicacao'),
-    auth        = require('../strategies/auth'),
-    Bot         = require('../models/Bot');
+    Bot         = require('../models/Bot'),
+    auth        = require('../../middlewares/auth');
 
 router.post('/app/cadastrar',           auth.signup);
-router.put('/app/:id/atualizar',        auth.isAuthenticated, atualizar);
 router.put('/app/:id/atualizar/token',  auth.refreshToken);
+router.put('/app/:id/atualizar',        auth.isAuthenticated, atualizar);
 router.get('/app/:id/bots/',            auth.isAuthenticated, pegarBot);
 
 function atualizar (req, res, next) {

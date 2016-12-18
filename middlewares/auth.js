@@ -1,7 +1,6 @@
 
 var jwt       = require('jsonwebtoken'),
-    config    = require('../config/config'),
-    Aplicacao = require('../models/Aplicacao'),
+    Aplicacao = require('../src/models/Aplicacao'),
     rn        = require('random-number'),
     hash      = require('hash-generator'),
     exports   = module.exports;
@@ -27,7 +26,7 @@ exports.isAuthenticated = function(req, res, next) {
   }
 
   token = headers.split('Bearer').pop().trim();
-  Aplicacao.verificarToken(token, config.secret.tokenSecret, function(err, decoded){
+  Aplicacao.verificarToken(token, "cufFz2Y7q734w011c3fMgOmje2XN4SH6", function(err, decoded){
 
     if (err) {
 
@@ -69,7 +68,7 @@ exports.signup = function (req, res, next) {
 
         dados.id = dadosApp._id;
 
-        Aplicacao.gerarToken(dados, config.secret.tokenSecret, function(err, token) {
+        Aplicacao.gerarToken(dados, "cufFz2Y7q734w011c3fMgOmje2XN4SH6", function(err, token) {
 
           if (err) {
             return res.status(202).json({
@@ -131,7 +130,7 @@ exports.refreshToken = function (req, res, next) {
         });
       }
 
-      Aplicacao.gerarToken(dados, config.secret.tokenSecret, function(err, token) {
+      Aplicacao.gerarToken(dados, "cufFz2Y7q734w011c3fMgOmje2XN4SH6", function(err, token) {
 
         if (err) {
           return res.status(202).json({

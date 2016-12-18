@@ -1,5 +1,4 @@
 var mongoose  = require('mongoose'),
-    frases    = require('../config/frases'),
     exports   = module.exports;
 
 var botSchema = new mongoose.Schema({
@@ -21,7 +20,7 @@ var Bot =  mongoose.model('Bot', botSchema);
 exports.cadastrar = function(dados, callback) {
 
   if(!dados.frases) {
-    dados.frases = frases;
+    dados.frases = {};
   }
 
   var bot = new Bot(dados);
