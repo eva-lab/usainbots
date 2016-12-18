@@ -16,14 +16,12 @@ var Bot               = require('../models/Bot'),
     Noticia           = require('../models/Noticia'),
     Evento            = require('../models/Evento');
 
-// Rotas
-router.post('/bot/cadastrar',                 cadastrar);
-router.put('/bot/:id/atualizar',              atualizar);
-router.get('/bot/:id/consulta',               consultar);
+router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
+router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
+router.get('/bot/:id/consulta',               auth.isAuthenticated, consultar);
 router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
-router.post('/bot/:id/documento/cadastrar',   cadastrarDocumento);
+router.post('/bot/:id/documento/cadastrar',   auth.isAuthenticated, cadastrarDocumento);
 
-// Callbacks
 function cadastrar (req, res, next) {
 
   if(req.body.dados) {
@@ -217,7 +215,7 @@ function consultar (req, res, next) {
             });
           }
 
-          return res.status(200).json({ tipo:'noticias', dados: noticias });
+          return res.status(200).json({ tipo:'noticias', noticias: noticias });
 
         });
       } else if (classify == 'eventos') {
@@ -230,7 +228,7 @@ function consultar (req, res, next) {
             });
           }
 
-          return res.status(200).json({ tipo:'eventos', dados: eventos });
+          return res.status(200).json({ tipo:'eventos', eventos: eventos });
 
         });
       } else {
@@ -300,18 +298,17 @@ function cadastrarDocumento (req, res, next) {
   if(req.params.id && req.body.dados) {
 
     var dados       = req.body.dados || [];
+    var tipo        = req.body.tipo || req.body.dados.tipo;
     var idBot       = req.params.id;
     var data        = moment().format();
 
-    if(!dados.tipo){
+    if(!tipo){
       return res.status(400).json({
-        erro: 'bad_request',
         mensagem: 'Erro de parâmetro(s)'
       });
     }
 
     dados.dataCriacao  = data;
-    dados.ultimaColeta = data;
 
     if(dados.uri) {
 

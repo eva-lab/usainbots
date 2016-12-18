@@ -135,11 +135,9 @@ exports.weightReply   = function(data) {
 
     tfidf = new TfIdf();
 
-    // console.log(documents[i].tags.titulo);
     tfidf.addDocument(documents[i].tags.titulo);
 
     for (var y = 0; y < documents[i].tags.conteudo.length; y++) {
-      // console.log(documents[i].tags.conteudo[y]);
       tfidf.addDocument(documents[i].tags.conteudo[y]);
     }
 
@@ -156,6 +154,8 @@ exports.weightReply   = function(data) {
         } else {
           weight = weightTitle / documents[i].tags.conteudo[z-1].length;
         }
+
+        weight = weight / 3;
 
         weights.push({
           indexDocument:  i,

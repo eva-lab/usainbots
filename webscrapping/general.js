@@ -94,7 +94,6 @@ exports.getContentWiki = function(data, done){
           uri:    data.uri,
           selector: data.selector || null,
           dataCriacao: data.dataCriacao,
-          ultimaColeta: data.ultimaColeta,
           titulo: titulo,
           conteudo: [conteudo],
         });
@@ -114,7 +113,6 @@ exports.getContentWiki = function(data, done){
           uri:    data.uri,
           selector: data.selector || null,
           dataCriacao: data.dataCriacao,
-          ultimaColeta: data.ultimaColeta,
           titulo: titulo,
           conteudo: [conteudo],
         });

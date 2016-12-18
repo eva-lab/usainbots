@@ -3,7 +3,7 @@ var mongoose  = require('mongoose'),
     exports   = module.exports;
 
 var botSchema = new mongoose.Schema({
-  idUsuario:          { type: String, require: true },
+  idApp:              { type: String, require: true },
   nome:               { type: String, require: true },
   dataCriacao:        { type: Date },
   frases: {
@@ -31,13 +31,7 @@ exports.cadastrar = function(dados, callback) {
     if(err) {
       callback(true, err);
     }else {
-      callback(false, {
-        idBot:        dados._id,
-        idUsuario:    dados.idUsuario,
-        nome:         dados.nome,
-        dataCriacao:  dados.dataCriacao,
-        frases:       dados.frases
-      });
+      callback(false, dados);
     }
 
   });
@@ -83,13 +77,7 @@ exports.atualizar = function(dadosReq, callback) {
         if(err){
           callback(true, err);
         } else {
-          callback(false, {
-            idBot:       dados._id,
-            idUsuario:   dados.idUsuario,
-            nome:        dados.nome,
-            dataCriacao: dados.dataCriacao,
-            frases:      dados.frases
-          });
+          callback(false, dados);
         }
       });
 
@@ -112,10 +100,10 @@ exports.remover = function(id, callback) {
 
 };
 
-// Pegar Bots pelo ID do Usuário
-exports.pegarPeloIdUsuario = function(id, callback) {
+// Pegar Bots pelo ID do APP
+exports.pegarPeloIdApp = function(id, callback) {
 
-  Bot.find({ 'idUsuario': id }, function(err, dados){
+  Bot.find({ 'idApp': id }, function(err, dados){
 
     if (!dados) {
       callback(true, dados);
