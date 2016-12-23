@@ -1,5 +1,4 @@
 var express     = require('express'),
-    CIn         = require('../webscrapping/cin'),
     General     = require('../webscrapping/general');
     exports     = module.exports;
 
