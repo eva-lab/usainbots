@@ -9,6 +9,7 @@ var express           = require('express'),
     Bot               = require('../models/Bot'),
     Documento         = require('../models/Documento'),
     extractor         = require('../../modules/natural_processing/extractor'),
+    weighter            = require('../../modules/natural_processing/weight');
 
 router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
