@@ -7,7 +7,8 @@ var express           = require('express'),
     pln               = require('../../modules/pln'),
     webScrapping      = require('../../modules/webscrapping/'),
     Bot               = require('../models/Bot'),
-    Documento         = require('../models/Documento');
+    Documento         = require('../models/Documento'),
+    extractor         = require('../../modules/natural_processing/extractor'),
 
 router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
