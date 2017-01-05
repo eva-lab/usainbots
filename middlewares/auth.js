@@ -66,7 +66,7 @@ exports.signup = function (req, res, next) {
         });
       } else {
 
-        dados.id = dadosApp._id;
+        dados._id = dadosApp._id;
 
         Aplicacao.gerarToken(dados, "cufFz2Y7q734w011c3fMgOmje2XN4SH6", function(err, token) {
 
