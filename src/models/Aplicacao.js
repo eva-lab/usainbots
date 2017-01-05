@@ -49,7 +49,6 @@ exports.cadastrar = function(dados, callback) {
 };
 
 exports.atualizar = function(dadosReq, callback) {
-  console.log(dadosReq._id);
 
   Aplicacao.findById(dadosReq._id, function(err, dados){
 

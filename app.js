@@ -3,9 +3,8 @@ var express       = require('express'),
     bodyParser    = require('body-parser'),
     cookieParser  = require('cookie-parser'),
     mongoose      = require('mongoose'),
-    loader        = require('./lib/loader'),
-    cronjobs      = require('./lib/cronjobs'),
-    Config        = require('./config');
+    Config        = require('./config'),
+    loader        = require('./core/loader');
 
 (function initApp () {
 
@@ -31,26 +30,20 @@ var express       = require('express'),
         next();
       });
 
-      loadControllers();
       loadDB(config);
 
       app.listen(config.port, function () {
         console.log('# seviço rodando na porta ' + config.port);
       });
 
-      cronjobs.start();
+      var load  = loader.init();
+      for (var i = 0; i < load.length; i++) {
+        app.use(require(load[i]));
+      }
 
     }
 
 })();
-
-function loadControllers(){
-  loader.loadRequire("src/controllers", function (files){
-    for (var i = 0; i < files.length; i++) {
-      app.use(require(files[i]));
-    }
-  });
-}
 
 function loadDB (config) {
 

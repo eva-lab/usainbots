@@ -1,7 +1,8 @@
 
 var natural               = require('natural'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
-    stopwords             = require('keyword-extractor');
+    stopwords             = require('keyword-extractor')
+    exports               = module.exports;
 
 exports.extract = function (data, options) {
 
@@ -64,7 +65,14 @@ exports.extract = function (data, options) {
     }
 
     if (config.tokenizer) {
-      data[i] = tokenizer.tokenize(data[i]);
+
+      if(!config.characters) {
+        tokenizer = new natural.WordPunctTokenizer();
+        data[i] = tokenizer.tokenize(data[i]);
+      } else {
+        data[i] = tokenizer.tokenize(data[i]);
+      }
+
     }
 
     if(config.stemmering) {
@@ -72,14 +80,15 @@ exports.extract = function (data, options) {
       if(!config.tokenizer){
 
         tokenizer = new natural.WordPunctTokenizer();
-        data[i]  = tokenizer.tokenize(data[i]);
+        var tokens  = tokenizer.tokenize(data[i]);
 
-        for (var y = 0; i < data[i].length; i++) {
-          data[i][y] = stemmer.stemWord(data[i][y]);
+        for (var y = 0; y < tokens.length; y++) {
+          tokens[y] = stemmer.stemWord(tokens[y]);
         }
 
-        data[i] = data[i].toString();
-        data[i] = data[i].replace(/,/gi, " ");
+        tokens = tokens.toString();
+        tokens = tokens.replace(/,/gi, " ");
+        data[i] = tokens;
 
       } else {
 

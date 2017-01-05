@@ -1,5 +1,5 @@
 var express     = require('express'),
-    General     = require('../webscrapping/general');
+    General     = require('./general');
     exports     = module.exports;
 
 exports.process = function(data, done) {
@@ -11,14 +11,6 @@ exports.process = function(data, done) {
   } else if(data.tipo == 'wiki') {
 
     General.getContentWiki(data, done);
-
-  } else if(data.tipo == 'cin-noticias') {
-
-    CIn.getNews(done);
-
-  } else if(data.tipo == 'cin-eventos') {
-
-    CIn.getEvents(done);
 
   }
 

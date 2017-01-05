@@ -22,6 +22,8 @@ var Documento  =  mongoose.model('Documento', documentoSchema);
 
 exports.cadastrarDocumento = function(dados, callback) {
 
+  console.log(dados);
+
   Documento.insertMany(dados, function(err, documentos){
     if(err){
       callback(true);

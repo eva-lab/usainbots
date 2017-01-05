@@ -2,14 +2,13 @@ var express           = require('express'),
     router            = express.Router(),
     moment            = require('moment'),
     rn                = require('random-number'),
-    natural           = require('natural'),
     auth              = require('../../middlewares/auth'),
-    pln               = require('../../modules/pln'),
-    webScrapping      = require('../../modules/webscrapping/'),
-    Bot               = require('../models/Bot'),
-    Documento         = require('../models/Documento'),
+    webScrapping      = require('../../modules/crawler/'),
+    classifier        = require('../../modules/natural_processing/classifier'),
     extractor         = require('../../modules/natural_processing/extractor'),
-    weighter            = require('../../modules/natural_processing/weight');
+    weighter          = require('../../modules/natural_processing/weight'),
+    Bot               = require('../models/Bot'),
+    Documento         = require('../models/Documento');
 
 router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
 router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
@@ -103,150 +102,92 @@ function atualizar (req, res, next) {
 
 function consultar (req, res, next) {
 
-  if (req.params.id && req.query.q) {
+  if(!req.params.id || !req.query.q) {
+    return res.status(400).json({
+      erro: 'bad_request',
+      mensagem: 'Erro(s) de parâmetro(s)'
+    });
+  }
 
-    var sentenceOriginal = req.query.q;
-    var dados = { idBot : req.params.id, query : null, limite: 5};
+  var sentenceOriginal = req.query.q;
+  var dados = { idBot : req.params.id, query : null, limite: 5};
 
-    Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
+  Bot.pegarPeloIdBot(dados.idBot, function(err, bot) {
 
-      if (err) {
-        return res.status(404).json({
-          erro: 'not_found',
-          mensagem: 'Bot não encontrado'
-        });
-      }
+    if (err) {
+      return res.status(404).json({
+        erro: 'not_found',
+        mensagem: 'Bot não encontrado'
+      });
+    }
 
-      var random          = null;
-      var resposta        = null;
-      var botSentences    = bot.frases;
+    var random          = null;
+    var resposta        = null;
 
-      dados.query = pln.processQuery(sentenceOriginal, { stemmering: true, lowercase: true, accent: true });
+    dados.query = extractor.extract(sentenceOriginal, { stemmering: true, lowercase: true, accent: true });
 
-      var classify = pln.classifier(dados.query);
+    var classify = classifier.classify(dados.query);
 
-      if(!botSentences.semResposta || botSentences.semResposta.length < 1){
-        botSentences.semResposta = frases.semResposta
-      }
+    switch (classify) {
 
-      if(!botSentences.agradecimento || botSentences.agradecimento.length < 1){
-        botSentences.agradecimento = frases.agradecimento
-      }
+      case "questionamento":
 
-      if(!botSentences.encerramento || botSentences.encerramento.length < 1){
-        botSentences.encerramento = frases.encerramento
-      }
-
-      if(!botSentences.abertura || botSentences.abertura.length < 1){
-        botSentences.abertura = frases.abertura
-      }
-
-      if(!botSentences.engajamento || botSentences.engajamento.length < 1){
-        botSentences.engajamento = frases.engajamento
-      }
-
-      if (classify == 'apresentacao') {
-
-        resposta = respostaRandom(botSentences.abertura);
-        return res.status(200).json({ resposta: resposta });
-
-      } else if (classify == 'questionamento'){
-
-        dados.query = pln.processQuery(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true });
+        dados.query = extractor.extract(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true })[0];
 
         Documento.consultarPeloIdBot(dados, function(err, documentos) {
-
           if (err) {
             return res.status(500).json({
               erro: 'internal_server_error',
               mensagem: 'Erro Interno'
             });
           } else if(!documentos || documentos == "") {
-
             Documento.consultarRandom(dados, function(err, documentos) {
-
-              resposta = respostaRandom(botSentences.semResposta);
-              resposta = resposta + "\n" + respostaRandom(botSentences.engajamento);
-
+              resposta = respostaRandom(bot.frases.semResposta);
+              resposta = resposta + "\n" + respostaRandom(bot.frases.engajamento);
               return res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
-
             });
-
           } else {
-
             // com resposta
-            resposta = pln.weightReply({ documents: documentos, query: dados.query });
-
+            console.log(documentos);
+            resposta = weighter.weightDocuments({ documents: documentos, query: dados.query });
+            console.log(resposta);
             Documento.consultarRandom(dados, function(err, documentos) {
-              res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
-            });
-
-          }
-
-        });
-
-      } else if (classify == 'agradecimento'){
-
-        resposta = respostaRandom(botSentences.agradecimento);
-        return res.status(200).json({ resposta: resposta });
-
-      } else if (classify == 'encerramento'){
-
-        resposta = respostaRandom(botSentences.encerramento);
-        return res.status(200).json({ resposta: resposta });
-
-      } else if (classify == 'abertura') {
-
-        resposta = respostaRandom(botSentences.engajamento);
-        return res.status(200).json({ resposta: resposta });
-
-      } else if (classify == 'noticias') {
-        Noticia.pegar(function(err, noticias){
-
-          if (err || !noticias) {
-            return res.status(404).json({
-              erro: 'not_found',
-              mensagem: 'Não foi encontrada nenhuma noticia'
+              return res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
             });
           }
-
-          return res.status(200).json({ tipo:'noticias', noticias: noticias });
-
         });
-      } else if (classify == 'eventos') {
-        Evento.pegar(function(err, eventos){
 
-          if (err || !eventos) {
-            return res.status(404).json({
-              erro: 'not_found',
-              mensagem: 'Não foi encontrado nenhum evento'
-            });
-          }
+        break;
 
-          return res.status(200).json({ tipo:'eventos', eventos: eventos });
+      case "apresentacao":
+      case "agradecimento":
+      case "encerramento":
+      case "abertura":
 
-        });
-      } else {
+        var tipo = "apresentacao";
 
+        if (classify == "agradecimento") {
+          tipo = bot.frases.agradecimento;
+        } else if(classify == "encerramento") {
+          tipo = bot.frases.encerramento;
+        } else {
+          tipo = bot.frases.abertura;
+        }
+
+        resposta = respostaRandom(tipo);
+        return res.status(200).json({ resposta: resposta });
+        break;
+
+      default:
         Documento.consultarRandom(dados, function(err, documentos) {
-
-          resposta = respostaRandom(botSentences.semResposta);
-          resposta = resposta + "\n" + respostaRandom(botSentences.engajamento);
-
-          res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
-
+          resposta = respostaRandom(bot.frases.semResposta);
+          resposta = resposta + "\n" + respostaRandom(bot.frases.engajamento);
+          return res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
         });
 
-      }
+    }
 
-    });
-
-  } else {
-    res.status(400).json({
-      erro: 'bad_request',
-      mensagem: 'Erro(s) de parâmetro(s)'
-    });
-  }
+  });
 
 }
 
@@ -316,7 +257,7 @@ function cadastrarDocumento (req, res, next) {
           });
         }
 
-        inserirDocumento(dados, function(err, dados){
+        inserirDocumento(dados, idBot, function(err, dados){
 
           if(err) {
             return res.status(404).json({
@@ -336,7 +277,7 @@ function cadastrarDocumento (req, res, next) {
 
     } else {
 
-      inserirDocumento(dados, function(err, dados){
+      inserirDocumento(dados, idBot, function(err, dados){
 
         if(err) {
           return res.status(404).json({
@@ -364,19 +305,27 @@ function cadastrarDocumento (req, res, next) {
 
 }
 
-function inserirDocumento (dados, callback) {
+function inserirDocumento (dados, idBot, callback) {
+
+  console.log(dados, idBot);
 
     if(!dados.length) {
       dados = [dados];
     }
 
-    dados = pln.processData(dados, true);
+    var tags = [];
+    for (var i = 0; i < dados.length; i++) {
+      tags.push({
+        titulo:   extractor.extract([dados[i].titulo]),
+        conteudo: extractor.extract(dados[i].conteudo)
+      });
+      dados[i].idBot = idBot;
+      dados[i].tags = tags[i];
+    }
 
     Documento.cadastrarDocumento(dados, function(err, documento){
 
-      if(err) {
-        callback(true);
-      }
+      if(err)  return callback(true);
 
       callback(false, documento);
 
