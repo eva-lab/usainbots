@@ -9,11 +9,10 @@ exports.extract = function (data, options) {
   var config        =  {};
   var tokenizer     = new natural.WordTokenizer();
   var stemmer       = new PortugueseStemmer();
+  var documents     = [];
 
-  if(typeof data != "object") {
-    var toArray = [];
-    toArray.push(data);
-    data = toArray;
+  for (var i = 0; i < data.length; i++) {
+    documents.push(data[i]);
   }
 
   if(!options || options == "") {
@@ -38,39 +37,39 @@ exports.extract = function (data, options) {
 
   }
 
-  for (var i = 0; i < data.length; i++) {
+  for (var i = 0; i < documents.length; i++) {
 
     if (config.lowercase) {
-      data[i] = data[i].toLowerCase();
+      documents[i] = documents[i].toLowerCase();
     }
 
     if (config.stopwords) {
 
-      data[i] = stopwords.extract(data[i], {
+      documents[i] = stopwords.extract(documents[i], {
         language: "portuguese",
         remove_digits: false,
         return_changed_case: true,
         remove_duplicates: false
       });
-      data[i] = data[i].toString();
-      data[i] = data[i].replace(/,/gi, " ");
+      documents[i] = documents[i].toString();
+      documents[i] = documents[i].replace(/,/gi, " ");
     }
 
     if(config.accent){
-      data[i] = removeAceents(data[i]);
+      documents[i] = removeAceents(documents[i]);
     }
 
     if(config.characters){
-      data[i] = data[i].replace(/[^a-z A-Z 0-9]/g,'');
+      documents[i] = documents[i].replace(/[^a-z A-Z 0-9]/g,'');
     }
 
     if (config.tokenizer) {
 
       if(!config.characters) {
         tokenizer = new natural.WordPunctTokenizer();
-        data[i] = tokenizer.tokenize(data[i]);
+        documents[i] = tokenizer.tokenize(documents[i]);
       } else {
-        data[i] = tokenizer.tokenize(data[i]);
+        documents[i] = tokenizer.tokenize(documents[i]);
       }
 
     }
@@ -80,7 +79,7 @@ exports.extract = function (data, options) {
       if(!config.tokenizer){
 
         tokenizer = new natural.WordPunctTokenizer();
-        var tokens  = tokenizer.tokenize(data[i]);
+        var tokens  = tokenizer.tokenize(documents[i]);
 
         for (var y = 0; y < tokens.length; y++) {
           tokens[y] = stemmer.stemWord(tokens[y]);
@@ -88,17 +87,17 @@ exports.extract = function (data, options) {
 
         tokens = tokens.toString();
         tokens = tokens.replace(/,/gi, " ");
-        data[i] = tokens;
+        documents[i] = tokens;
 
       } else {
 
-        var stemm = data[i];
+        var stemm = documents[i];
 
         for (var y = 0; y < stemm.length; y++) {
           stemm[y] = stemmer.stemWord(stemm[y]);
         }
 
-        data[i] = stemm;
+        documents[i] = stemm;
 
       }
 
@@ -106,7 +105,7 @@ exports.extract = function (data, options) {
 
   }
 
-  return data;
+  return documents;
 
 }
 

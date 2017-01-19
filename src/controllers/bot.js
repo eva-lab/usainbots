@@ -303,33 +303,29 @@ function cadastrarDocumento (req, res, next) {
 
 }
 
-function inserirDocumento (dados, idBot, callback) {
+function inserirDocumento (data, idBot, callback) {
 
-    if(!dados.length) {
-      dados = [dados];
-    }
-    var documentos = [];
-    for (var i = 0; i < dados.length; i++) {
-      dados[i] = {
-        titulo: dados[i].titulo,
-        conteudo: dados[i].conteudo,
+    if(!data instanceof Array)  data = [data];
+
+    var documents = [];
+
+    for (var i = 0; i < data.length; i++) {
+      documents.push({
+        titulo: data[i].titulo,
+        conteudo: data[i].conteudo,
         idBot: idBot,
         tags: {
-          titulo:   extractor.extract([dados[i].titulo]),
-          conteudo: extractor.extract(dados[i].conteudo)
+          titulo:   extractor.extract([data[i].titulo]),
+          conteudo: extractor.extract(data[i].conteudo)
         }
-      };
+      });
     }
 
-    console.log(dados[0]);
-
-    return;
-
-    Documento.cadastrarDocumento(dados, function(err, documento){
+    Documento.cadastrarDocumento(documents, function(err, savedDocuments){
 
       if(err)  return callback(true);
 
-      callback(false, documento);
+      callback(false, savedDocuments);
 
     });
 
