@@ -128,11 +128,12 @@ function consultar (req, res, next) {
 
     var classify = classifier.classify(dados.query);
 
+
     switch (classify) {
 
       case "questionamento":
 
-        dados.query = extractor.extract(sentenceOriginal, { characters: true, stopwords: true, tokenizer: true, stemmering: true })[0];
+        dados.query = extractor.extract(sentenceOriginal)[0];
 
         Documento.consultarPeloIdBot(dados, function(err, documentos) {
           if (err) {
@@ -305,7 +306,7 @@ function cadastrarDocumento (req, res, next) {
 
 function inserirDocumento (data, idBot, callback) {
 
-    if(!data instanceof Array)  data = [data];
+    if(!(data instanceof Array))  data = [data];
 
     var documents = [];
 

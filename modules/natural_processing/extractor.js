@@ -11,6 +11,10 @@ exports.extract = function (data, options) {
   var stemmer       = new PortugueseStemmer();
   var documents     = [];
 
+  if (!(data instanceof Array)) {
+    data = [data];
+  }
+
   for (var i = 0; i < data.length; i++) {
     documents.push(data[i]);
   }
