@@ -148,9 +148,7 @@ function consultar (req, res, next) {
             });
           } else {
             // com resposta
-            console.log(documentos);
             resposta = weighter.weightDocuments({ documents: documentos, query: dados.query });
-            console.log(resposta);
             Documento.consultarRandom(dados, function(err, documentos) {
               return res.status(200).json({ resposta: resposta, sugestoes: documentos || [] });
             });
@@ -307,21 +305,25 @@ function cadastrarDocumento (req, res, next) {
 
 function inserirDocumento (dados, idBot, callback) {
 
-  console.log(dados, idBot);
-
     if(!dados.length) {
       dados = [dados];
     }
-
-    var tags = [];
+    var documentos = [];
     for (var i = 0; i < dados.length; i++) {
-      tags.push({
-        titulo:   extractor.extract([dados[i].titulo]),
-        conteudo: extractor.extract(dados[i].conteudo)
-      });
-      dados[i].idBot = idBot;
-      dados[i].tags = tags[i];
+      dados[i] = {
+        titulo: dados[i].titulo,
+        conteudo: dados[i].conteudo,
+        idBot: idBot,
+        tags: {
+          titulo:   extractor.extract([dados[i].titulo]),
+          conteudo: extractor.extract(dados[i].conteudo)
+        }
+      };
     }
+
+    console.log(dados[0]);
+
+    return;
 
     Documento.cadastrarDocumento(dados, function(err, documento){
 
