@@ -102,7 +102,7 @@ exports.signup = function (req, res, next) {
 
   } else {
     return res.status(400).json({
-      mensagem: 'Erro de requisição'
+      mensagem: 'Erro de parâmetro(s)'
     });
   }
 
