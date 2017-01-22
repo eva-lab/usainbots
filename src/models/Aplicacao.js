@@ -78,7 +78,7 @@ exports.atualizar = function(dadosReq, callback) {
 
 };
 
-exports.pegar     = function(dados, callback) {
+exports.pegar = function(dados, callback) {
 
   Aplicacao.findOne({
     $and: [
