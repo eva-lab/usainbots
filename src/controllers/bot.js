@@ -18,9 +18,10 @@ router.post('/bot/:id/documento/cadastrar',   auth.isAuthenticated, cadastrarDoc
 
 function cadastrar (req, res, next) {
 
-  if(req.body.dados) {
+  var dadosReq = req.body.dados;
 
-    var dadosReq = req.body.dados;
+  if(dadosReq && dadosReq.idApp && dadosReq.nome) {
+
     dadosReq.dataCriacao = moment().format();
 
     Bot.cadastrar(dadosReq, function(err, dados){
