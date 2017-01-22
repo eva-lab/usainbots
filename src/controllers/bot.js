@@ -27,7 +27,6 @@ function cadastrar (req, res, next) {
 
       if(err || !dados) {
         res.status(404).json({
-          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
 
@@ -43,7 +42,6 @@ function cadastrar (req, res, next) {
   } else {
 
     res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro de parâmetro(s)'
     });
 
@@ -64,7 +62,6 @@ function atualizar (req, res, next) {
 
       if(err || !dados) {
         res.status(404).json({
-          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       } else {
@@ -79,7 +76,6 @@ function atualizar (req, res, next) {
         } else {
 
           res.status(404).json({
-            erro: 'not_found',
             mensagem: 'Bot não encontrado'
           });
 
@@ -92,7 +88,6 @@ function atualizar (req, res, next) {
   } else {
 
     res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro(s) de parâmetro(s)'
     });
 
@@ -104,7 +99,6 @@ function consultar (req, res, next) {
 
   if(!req.params.id || !req.query.q) {
     return res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro(s) de parâmetro(s)'
     });
   }
@@ -116,7 +110,6 @@ function consultar (req, res, next) {
 
     if (err) {
       return res.status(404).json({
-        erro: 'not_found',
         mensagem: 'Bot não encontrado'
       });
     }
@@ -138,7 +131,6 @@ function consultar (req, res, next) {
         Documento.consultarPeloIdBot(dados, function(err, documentos) {
           if (err) {
             return res.status(500).json({
-              erro: 'internal_server_error',
               mensagem: 'Erro Interno'
             });
           } else if(!documentos || documentos == "") {
@@ -206,7 +198,6 @@ function remover (req, res, next) {
 
       if(err) {
         res.status(404).json({
-          erro: 'not_found',
           mensagem: 'Bot não encontrado'
         });
       } else {
@@ -220,7 +211,6 @@ function remover (req, res, next) {
   } else {
 
     res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro(s) de parâmetro(s)'
     });
 
@@ -251,7 +241,6 @@ function cadastrarDocumento (req, res, next) {
 
         if(err) {
           return res.status(404).json({
-            erro: 'not_found',
             mensagem: 'Página não encontrada'
           });
         }
@@ -260,7 +249,6 @@ function cadastrarDocumento (req, res, next) {
 
           if(err) {
             return res.status(404).json({
-              erro: 'not_found',
               mensagem: 'Página não encontrada'
             });
           }
@@ -280,7 +268,6 @@ function cadastrarDocumento (req, res, next) {
 
         if(err) {
           return res.status(404).json({
-            erro: 'not_found',
             mensagem: 'Página não encontrada'
           });
         }
@@ -296,7 +283,6 @@ function cadastrarDocumento (req, res, next) {
   } else {
 
     res.status(400).json({
-      erro: 'bad_request',
       mensagem: 'Erro de parâmetro(s)'
     });
 
