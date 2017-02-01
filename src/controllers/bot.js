@@ -10,11 +10,11 @@ var express           = require('express'),
     Bot               = require('../models/Bot'),
     Documento         = require('../models/Documento');
 
-router.post('/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
-router.put('/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
-router.get('/bot/:id/consulta',               auth.isAuthenticated, consultar);
-router.delete('/bot/:id/remover',             auth.isAuthenticated, remover);
-router.post('/bot/:id/documento/cadastrar',   auth.isAuthenticated, cadastrarDocumento);
+router.post('/v1.0/bot/cadastrar',                 auth.isAuthenticated, cadastrar);
+router.put('/v1.0/bot/:id/atualizar',              auth.isAuthenticated, atualizar);
+router.get('/v1.0/bot/:id/consultar',               auth.isAuthenticated, consultar);
+router.delete('/v1.0/bot/:id/remover',             auth.isAuthenticated, remover);
+router.post('/v1.0/bot/:id/documento/cadastrar',   auth.isAuthenticated, cadastrarDocumento);
 
 function cadastrar (req, res, next) {
 

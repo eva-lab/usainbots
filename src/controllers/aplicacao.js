@@ -4,10 +4,9 @@ var express     = require('express'),
     Bot         = require('../models/Bot'),
     auth        = require('../../middlewares/auth');
 
-router.post('/app/cadastrar',           auth.signup);
-router.put('/app/:id/atualizar/token',  auth.refreshToken);
-router.get('/app/:id/bots/',            auth.isAuthenticated, pegarBot);
-
+router.post('/v1.0/app/cadastrar',           auth.signup);
+router.put('/v1.0/app/:id/atualizar/token',  auth.refreshToken);
+router.get('/v1.0/app/:id/bots/',            auth.isAuthenticated, pegarBot);
 function pegarBot (req, res, next) {
 
   if(req.params.id) {
