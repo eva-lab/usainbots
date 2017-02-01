@@ -1,13 +1,15 @@
 {
-  "name": "API - UsainBot",
-  "version": "1.1.0",
-  "host": "http://localhost",
-  "port": "8080",
+  "name": "YOUR_NAME",
+  "host": "YOUT_HOST",
+  "port": "YOUR_PORT",
   "secret": {
-    "tokenSecret" : "cufFz2Y7q734w011c3fMgOmje2XN4SH6"
+    "tokenSecret" : "YOUT_TOKEN_SECRET_APPLICATION"
   },
-  "bd": {
-    "host": "mongodb://localhost/",
-    "name": "usainbots"
+  "db": {
+    "host": "YOUR_HOST",
+    "name": "YOUR_NAME",
+    "user": "YOUR_USER",
+    "password": "YOUR_PASS",
+    "port": "YOUR_PORT"
   }
 }

@@ -48,7 +48,10 @@ var express       = require('express'),
 function loadDB (config) {
 
   mongoose.Promise = global.Promise;
-  mongoose.connect(config.bd.host + config.bd.name, function(err){
+  mongoose.connect("mongodb://" + config.db.user + ":" + config.db.password + "@" + config.db.host + ":" + config.db.port + "/" + config.db.name,
+
+  function(err){
+
     if(err){
       console.log('# não foi possível conectar ao banco de dados');
       return;
