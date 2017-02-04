@@ -3,7 +3,7 @@ var express       = require('express'),
     bodyParser    = require('body-parser'),
     cookieParser  = require('cookie-parser'),
     mongoose      = require('mongoose'),
-    Config        = require('./config'),
+    Config        = require('./core/config'),
     loader        = require('./core/loader');
 
 (function initApp () {

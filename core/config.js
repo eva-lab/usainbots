@@ -1,5 +1,5 @@
-var env_dev  = require('./env/development.json'),
-    env_prod   = require('./env/production.json'),
+var env_dev  = require('../env/development.json'),
+    env_prod   = require('../env/production.json'),
     exports   = module.exports;
 
 exports.env = function(){
