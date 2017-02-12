@@ -49,14 +49,20 @@ exports.extract = function (data, options) {
 
     if (config.stopwords) {
 
-      documents[i] = stopwords.extract(documents[i], {
+      var sentence = documents[i];
+
+      sentence = stopwords.extract(sentence, {
         language: "portuguese",
         remove_digits: false,
         return_changed_case: true,
         remove_duplicates: false
       });
-      documents[i] = documents[i].toString();
-      documents[i] = documents[i].replace(/,/gi, " ");
+
+      if ((sentence instanceof Array) && (sentence.length > 0)) {
+        sentence = sentence.toString();
+        documents[i] = sentence.replace(/,/gi, " ");
+      }
+
     }
 
     if(config.accent){

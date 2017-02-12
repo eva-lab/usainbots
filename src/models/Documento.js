@@ -10,7 +10,7 @@ var documentoSchema = new mongoose.Schema({
   titulo:       { type: String },
   conteudo:     [ String ],
   tags: {
-    titulo:   [ String ],
+    titulo:   [],
     conteudo: []
   },
   dataCriacao:  { type: Date, require: true }
