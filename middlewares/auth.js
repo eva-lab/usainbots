@@ -113,7 +113,7 @@ exports.refreshToken = function (req, res, next) {
 
   var dados = req.body.dados;
   dados._id  = req.params.id;
-
+  
   if(dados && dados.secret && dados._id) {
 
     Aplicacao.pegar(dados, function(err, dados) {

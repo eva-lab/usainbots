@@ -1,0 +1,25 @@
+{
+  "core" :  [
+    { "word": "muito obrigo", "classify": "agradecimento" },
+    { "word": "valeu", "classify": "agradecimento" },
+    { "word": "fico muito agradecido", "classify": "agradecimento" },
+    { "word": "vlw", "classify": "agradecimento" },
+    { "word": "até logo", "classify": "encerramento" },
+    { "word": "tchau", "classify": "encerramento" },
+    { "word": "xau", "classify": "encerramento" },
+    { "word": "bye", "classify": "encerramento" },
+    { "word": "abertura", "classify": "apresentacao" },
+    { "word": "olá", "classify": "abertura" },
+    { "word": "hi", "classify": "abertura" },
+    { "word": "oi", "classify": "abertura" },
+    { "word": "gostaria de saber ?", "classify": "questionamento" },
+    { "word": "você pode me dizer como faz para ?", "classify": "questionamento" },
+    { "word": "eu preciso saber sobre como ?", "classify": "questionamento" },
+    { "word": "eu necessito saber sobre como ?", "classify": "questionamento" },
+    { "word": "com faz para ?", "classify": "questionamento" },
+    { "word": "com eu posso ?", "classify": "questionamento" },
+    { "word": "qual o procedimento para ?", "classify": "questionamento" },
+    { "word": "quais as últimas notícias?", "classify": "cinNews" },
+    { "word": "quais os últimos eventos?", "classify": "cinEvents" }
+  ]
+}

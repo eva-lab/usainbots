@@ -1,0 +1,11 @@
+
+{
+  "modules": [
+    {
+      "name": "cincrawler",
+      "version": "1.0.0",
+      "main": "main",
+      "cronjob": true
+    }
+  ]
+}

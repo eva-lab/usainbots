@@ -3,8 +3,9 @@ var express       = require('express'),
     bodyParser    = require('body-parser'),
     cookieParser  = require('cookie-parser'),
     mongoose      = require('mongoose'),
-    Config        = require('./core/config'),
-    loader        = require('./core/loader');
+    Config        = require('./config/config'),
+    loader        = require('./src/libs/loader'),
+    addons        = require('./addons/addons.json');
 
 (function initApp () {
 
@@ -30,16 +31,25 @@ var express       = require('express'),
         next();
       });
 
+      // Load CronJobs
+      for(let i = 0; i < addons.modules.length; i++) {
+        if(addons.modules[i].cronjob) {
+          require('./addons/' + addons.modules[i].name).main();
+        }
+      }
+
       loadDB(config);
+
+      app.use(errorHandler);
+
+      let load  = loader.load(["controllers"]);
+      for (let i = 0; i < load.length; i++) {
+        app.use(require(load[i]));
+      }
 
       app.listen(config.port, function () {
         console.log('# seviço rodando na porta ' + config.port);
       });
-
-      var load  = loader.init();
-      for (var i = 0; i < load.length; i++) {
-        app.use(require(load[i]));
-      }
 
     }
 
@@ -52,7 +62,7 @@ function loadDB (config) {
 
   function(err){
 
-    if(err){
+    if(err) {
       console.log('# não foi possível conectar ao banco de dados');
       return;
     } else {
@@ -60,4 +70,9 @@ function loadDB (config) {
     }
   });
 
+}
+
+function errorHandler(err, req, res, next) {
+  res.status(500);
+  res.render('error', { error: err });
 }
