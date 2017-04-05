@@ -59,9 +59,11 @@ module.exports.wiki = function (data, done) {
 
     });
 
-  }
+    done(false, extract);
 
-  done(false, extract);
+  } else {
+    done(true, {});    
+  }
 
 };
 
