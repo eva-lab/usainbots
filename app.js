@@ -1,7 +1,6 @@
 var express       = require('express'),
     app           = express(),
     bodyParser    = require('body-parser'),
-    cookieParser  = require('cookie-parser'),
     mongoose      = require('mongoose'),
     Config        = require('./config/config'),
     loader        = require('./src/libs/loader'),
@@ -11,14 +10,13 @@ var express       = require('express'),
 
     var config = Config.env();
 
-    if(config && config == ""){
+    if(config && config == "") {
 
       console.log("# ambiente não foi setado");
       return;
 
     } else {
 
-      app.use(cookieParser());
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
 
