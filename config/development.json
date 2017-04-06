@@ -1,15 +1,15 @@
 {
   "name": "API - UsainBot",
-  "host": "http://localhost",
+  "host": "HOST",
   "port": "8080",
   "secret": {
-    "tokenSecret" : "cufFz2Y7q734w011c3fMgOmje2XN4SH6"
+    "tokenSecret" : "TOKEN"
   },
   "db": {
-    "host": "localhost",
-    "name": "usainbots",
-    "user": "jorgehclinhares",
-    "password": "Zhb7iAAQUE",
+    "host": "BD_HOST",
+    "name": "BD_NAME",
+    "user": "BD_USER",
+    "password": "BD_PASS",
     "port": "27017"
   }
 }
