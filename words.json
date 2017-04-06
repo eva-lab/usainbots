@@ -2,20 +2,21 @@
   "abertura": [
     "Olá! eu sou o %s, no que posso ajudar?",
     "Oi! Seja bem vindo, eu sou o %s, no que posso ajudar?",
-    "Oi, eu sou o %s, posso ajudá-lo?",
-    "Hi! eu sou o %s, precisa de algo?",
-    "Oi! eu sou o %s, o seu robô do Centro de Informática. Você tem alguma coisa para me perguntar?"
+    "Oi, eu sou o %s, posso ajudá-lo?"
   ],
   "agradecimento": [
     "Por nada!",
     "Nada!",
     "Foi um prazer!",
-    "Não há de quê!"
+    "Não há de quê!",
+    ":D"
   ],
   "engajamento": [
     "Posso te ajudar?",
     "Você está precisando de algo?",
-    "Você precisa alguma coisa?"
+    "Você precisa alguma coisa?",
+    "Alguma dúvida?",
+    "Precisando de algo?"
   ],
   "encerramento": [
     "Foi bom conversar com você! :D",
@@ -26,7 +27,7 @@
   "semResposta": [
     "Humm... eu não sei nada sobre isso...",
     "Xii! To por fora desse assunto...",
-    "É amigo, realmente não sei nada sobre isso...",
+    "É, realmente não sei nada sobre isso...",
     "Foi mal, mas acho que não sei te responder..."
   ]
 }

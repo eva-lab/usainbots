@@ -1,4 +1,3 @@
-
 var natural               = require('natural'),
     PortugueseStemmer     = require('snowball-stemmer.jsx/dest/portuguese-stemmer.common.min.js').PortugueseStemmer,
     stopwords             = require('keyword-extractor')

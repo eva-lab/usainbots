@@ -1,6 +1,5 @@
-
 var natural               = require('natural'),
-    classify              = require('../../classify.json'),
+    classify              = require('./classify.json'),
     extractor             = require('./extractor.js'),
     exports               = module.exports;
 
@@ -15,13 +14,13 @@ exports.classify = function (query) {
     tokenizer: true,
     stemmering: true
   });
-
+  
   if(typeof query == 'object') {
     query = query[0];
   }
 
-  for (var i = 0; i < classify.core.length; i++) {
-    extract.push(classify.core[i].frase);
+  for (let i = 0; i < classify.core.length; i++) {
+    extract.push(classify.core[i].word);
   }
 
   extract = extractor.extract(extract, {
@@ -31,8 +30,8 @@ exports.classify = function (query) {
     stemmering: true
   });
 
-  for (var i = 0; i < classify.core.length; i++) {
-    classifier.addDocument(extract[i], classify.core[i].classificacao);
+  for (let i = 0; i < classify.core.length; i++) {
+    classifier.addDocument(extract[i], classify.core[i].classify);
   }
 
   classifier.train();
