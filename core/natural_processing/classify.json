@@ -3,7 +3,7 @@
     { "word": "muito obrigo", "classify": "agradecimento" },
     { "word": "valeu", "classify": "agradecimento" },
     { "word": "fico muito agradecido", "classify": "agradecimento" },
-    { "word": "vlw", "classify": "agradecimento" },
+    { "word": "valeu!", "classify": "agradecimento" },
     { "word": "até logo", "classify": "encerramento" },
     { "word": "tchau", "classify": "encerramento" },
     { "word": "xau", "classify": "encerramento" },
@@ -12,6 +12,9 @@
     { "word": "olá", "classify": "abertura" },
     { "word": "hi", "classify": "abertura" },
     { "word": "oi", "classify": "abertura" },
+    { "word": "qual é o ?", "classify": "questionamento" },
+    { "word": "quais são os ?", "classify": "questionamento" },
+    { "word": "fale sobre o", "classify": "questionamento" },
     { "word": "gostaria de saber ?", "classify": "questionamento" },
     { "word": "você pode me dizer como faz para ?", "classify": "questionamento" },
     { "word": "eu preciso saber sobre como ?", "classify": "questionamento" },
@@ -19,7 +22,9 @@
     { "word": "com faz para ?", "classify": "questionamento" },
     { "word": "com eu posso ?", "classify": "questionamento" },
     { "word": "qual o procedimento para ?", "classify": "questionamento" },
-    { "word": "quais as últimas notícias?", "classify": "cinNews" },
-    { "word": "quais os últimos eventos?", "classify": "cinEvents" }
+    { "word": "notícias ?", "classify": "cinNews" },
+    { "word": "eventos ?", "classify": "cinEvents" },
+    { "word": "ultimas notícias ?", "classify": "cinNews" },
+    { "word": "ultimos eventos ?", "classify": "cinEvents" }
   ]
 }
