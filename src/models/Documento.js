@@ -1,10 +1,11 @@
 var mongoose        = require('mongoose'),
     random          = require('mongoose-random'),
+    ObjectId        = mongoose.Schema.Types.ObjectId;
     exports         = module.exports;
 
 var documentoSchema = new mongoose.Schema({
-  idBot:        { type: String, require: true },
-  tipo:         { type: String, require: true },
+  idBot:        { type: ObjectId },
+  tipo:         { type: String },
   uri:          { type: String },
   seletor:      { type: String },
   titulo:       { type: String },
